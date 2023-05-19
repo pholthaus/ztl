@@ -39,11 +39,11 @@ class Task:
   SEPARATOR = "^"
   FIELDS = ["handler", "component", "goal"]
 
-  def decode(self, message):
-    cmd = base64.b64decode(bytes(message)).split(self.SEPARATOR)
-    return dict(zip(self.FIELDS, cmd))
+  def decode(message):
+    cmd = base64.b64decode(bytes(message, encoding='utf-8')).split(Task.SEPARATOR)
+    return dict(zip(Task.FIELDS, cmd))
 
-  def encode(self, handler, component, goal):
-    joined = str(handler) + self.SEPARATOR + str(component) + self.SEPARATOR + str(goal)
+  def encode(handler, component, goal):
+    joined = str(handler) + Task.SEPARATOR + str(component) + Task.SEPARATOR + str(goal)
     code = base64.b64encode(joined.encode('utf-8'))
     return code.decode("utf-8")
