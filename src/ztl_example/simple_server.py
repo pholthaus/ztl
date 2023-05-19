@@ -3,7 +3,7 @@
 import sys
 
 from ztl_core.server import ZMQServer
-from ztl_core.protocol import State
+from ztl_core.protocol import State, Task
 
 class ZMQSimpleHandler(object):
 
@@ -36,6 +36,8 @@ class ZMQSimpleHandler(object):
 
 
 if __name__ == "__main__":
+  
+  scope = sys.argv[1]
   run = ZMQServer(5555)
-  run.register("/simple", ZMQSimpleHandler())
+  run.register(scope, ZMQSimpleHandler())
   run.execute()
