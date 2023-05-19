@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ztl"
+version = "0.0.1"
+authors = [
+  { name="Patrick Holthaus", email="patrick.holthaus@googlemail.com" },
+]
+description = "A thin library relying on zmq to dispatch tasks"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: BSD 2-clause license",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://gitlab.com/robothouse/rh-user/ztl"
+"Bug Tracker" = "https://gitlab.com/robothouse/rh-user/ztl/issues"
