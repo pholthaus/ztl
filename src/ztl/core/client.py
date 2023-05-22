@@ -52,7 +52,7 @@ class RemoteTask(object):
     state = None
     while (time.time() - start) < timeout and mid > 0:
       state = self.status(mid)
-      if not state == State.ACCEPTED:
+      if state > State.ACCEPTED:
         return state
       time.sleep(.1)
     return state

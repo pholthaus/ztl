@@ -10,8 +10,8 @@ class Request:
 class State:
 
   INITIATED = 0
-  REJECTED = 1
-  ACCEPTED = 2
+  ACCEPTED = 1
+  REJECTED = 2
   FAILED = 3
   ABORTED = 4
   COMPLETED = 5

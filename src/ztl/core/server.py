@@ -5,7 +5,7 @@ import logging
 
 from ztl.core.protocol import Message, Request, State
 
-class ZMQServer(object):
+class TaskServer(object):
 
   def __init__(self, port):
     context = zmq.Context()
@@ -13,7 +13,7 @@ class ZMQServer(object):
     address = "tcp://*:" + str(port)
     self.socket.bind(address)
     self.handlers = {}
-    print("ZMQ Server listening at '%s'" % address)
+    print("Task Server listening at '%s'" % address)
 
 
   def send_message(self, scope, mid, state, payload):

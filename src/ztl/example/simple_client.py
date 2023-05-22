@@ -3,6 +3,7 @@
 import sys
 
 from ztl.core.client import RemoteTask
+from ztl.core.protocol import State
 
 def main_cli():
   host = sys.argv[1]
@@ -14,11 +15,13 @@ def main_cli():
   print("Triggering task with payload '%s'..." % payload)
   mid = run.trigger(payload)
   print("Accepted as ID '%s'." % mid)
-  run.wait(mid, 1)
+  state = run.wait(mid, 5)
 
-  print("Aborting task with ID '%s'..." % mid)
-  run.abort(mid)
-  run.wait(mid)
+  if state <= State.ACCEPTED:
+    print("Aborting task with ID '%s'..." % mid)
+    run.abort(mid)
+    run.wait(mid)
+
   print("Task with ID '%s' finished." % mid)
 
 if __name__ == "__main__":
