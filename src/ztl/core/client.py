@@ -1,10 +1,11 @@
 import zmq
 import time
 import sys
+import logging
 
-from ztl_core.protocol import Message, Request, State
+from ztl.core.protocol import Message, Request, State
 
-class ZMQClient(object):
+class RemoteTask(object):
 
   def __init__(self, host, port, scope, timeout=2000):
     self.context = zmq.Context()
@@ -14,7 +15,7 @@ class ZMQClient(object):
     self.socket.connect(address)
     self.scope = scope
 
-    print("ZMQ client sending to " + address)
+    print("Remote task interface initialised at " + address)
 
   def trigger(self, payload):
     msg = Message.encode(self.scope, Request.INIT, -1, payload)
@@ -23,10 +24,7 @@ class ZMQClient(object):
       reply = Message.decode(self.socket.recv())
       return int(reply["id"])
     except Exception as e:
-      print("Exception: '%s' caught." % e)
-      print(sys.exc_info()[0])
-      print(sys.exc_info()[1])
-      print(sys.exc_info()[2])
+      logging.error(e)
       return -1
 
   def abort(self, mid, payload="abort command"):
@@ -36,10 +34,7 @@ class ZMQClient(object):
       reply = Message.decode(self.socket.recv())
       return int(reply["state"])
     except Exception as e:
-      print("Exception: '%s' caught." % e)
-      print(sys.exc_info()[0])
-      print(sys.exc_info()[1])
-      print(sys.exc_info()[2])
+      logging.error(e)
       return -1
 
   def status(self, mid, payload="status update"):
@@ -49,10 +44,7 @@ class ZMQClient(object):
       reply = Message.decode(self.socket.recv())
       return int(reply["state"])
     except Exception as e:
-      print("Exception: '%s' caught." % e)
-      print(sys.exc_info()[0])
-      print(sys.exc_info()[1])
-      print(sys.exc_info()[2])
+      logging.error(e)
       return -1
 
   def wait(self, mid, timeout = 5.0):

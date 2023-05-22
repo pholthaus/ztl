@@ -2,7 +2,7 @@ import zmq
 import time
 import sys
 
-from ztl_core.protocol import Message, Request, State
+from ztl.core.protocol import Message, Request, State
 
 class ZMQServer(object):
 

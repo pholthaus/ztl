@@ -2,8 +2,8 @@
 
 import sys
 
-from ztl_core.server import ZMQServer
-from ztl_core.protocol import State, Task
+from ztl.core.server import ZMQServer
+from ztl.core.protocol import State
 
 class ZMQSimpleHandler(object):
 
@@ -34,10 +34,12 @@ class ZMQSimpleHandler(object):
     else:
       return State.REJECTED, "Invalid ID"
 
-
-if __name__ == "__main__":
-  
+def main_cli():
   scope = sys.argv[1]
   run = ZMQServer(5555)
   run.register(scope, ZMQSimpleHandler())
   run.execute()
+  
+if __name__ == "__main__":
+  
+  main_cli()
