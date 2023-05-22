@@ -4,7 +4,6 @@ from ztl.core.protocol import State
 
 class ThreadedTask(Thread):
 
-
   def __init__(self, client, *parameters):
     Thread.__init__(self)
     self.ctrl = None
@@ -16,7 +15,7 @@ class ThreadedTask(Thread):
 
 
   def run(self):
-    logging.info("Initiating task controller...")
+    logging.info("Initiating task...")
     self.ctrl = self.client(*self.parameters)
     if not self.prevent:
       logging.info("Accepting and executing task...")
@@ -30,18 +29,23 @@ class ThreadedTask(Thread):
         self.state = State.FAILED
     else:
       self.state = State.FAILED
-      logging.warn("Task execution prevented during controller initialising.")
+      logging.warn("Task execution prevented during initialising.")
     return self.state
 
 
   def stop(self):
     if self.ctrl is None:
-      logging.info("Preventing controller from executing as requested...")
+      logging.info("Preventing task from executing...")
       self.prevent = True
+      self.state = State.ABORTED
     else:
-      logging.info("Aborting execution as requested...")
-      self.ctrl.abort()
-    self.state = State.ABORTED
+      logging.info("Aborting task execution...")
+      success = self.ctrl.abort()
+      if success:
+        logging.info("Task aborted successfully.")
+        self.state = State.ABORTED
+      else:
+        logging.warning("Task could not be aborted.")
 
 
   def abort(self):
@@ -58,3 +62,13 @@ class InstantTask(ThreadedTask):
 
   def stop(self):
     logging.warning("Aborting not supported, ignoring...")
+
+
+class Task(object):
+
+  def execute(self):
+    return True
+
+
+  def abort(self):
+    return True
