@@ -1,6 +1,7 @@
 import zmq
 import time
 import sys
+import logging
 
 from ztl.core.protocol import Message, Request, State
 
@@ -69,8 +70,5 @@ class ZMQServer(object):
           print("Unknown command received '%s', ignoring." % message)
 
       except Exception as e:
-        print("Exception: '%s' caught." % e)
-        print(sys.exc_info()[0])
-        print(sys.exc_info()[1])
-        print(sys.exc_info()[2])
+        logging.error(e)
         time.sleep(1)
