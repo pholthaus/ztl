@@ -11,7 +11,7 @@ def main_cli():
   server = TaskServer(5555)
   server.register(scope, SimpleTaskHandler())
   server.listen()
-  
+
 if __name__ == "__main__":
-  
+
   main_cli()
