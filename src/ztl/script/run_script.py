@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import time
-import yaml
+import oyaml as yaml
 import argparse
 import os
 import logging
@@ -31,7 +31,7 @@ class ScriptExecutor(object):
 
 
   def execute_scene(self, scene):
-    steps = sorted(list(self.script[scene].keys()))
+    steps = list(self.script[scene].keys())
     for step in steps:
       print("STARTING STEP '%s'" % step)
 
@@ -65,7 +65,7 @@ class ScriptExecutor(object):
   def confirm_scene(self, scene):
     steps = list(self.script[scene].keys())
 
-    for step in sorted(steps):
+    for step in steps:
       print("STEP: %s" % step)
       handlers = self.script[scene][step].keys()
       for handler in handlers:
@@ -81,7 +81,7 @@ class ScriptExecutor(object):
 
   def execute(self):
     try:
-        for scene in sorted(self.script.keys()):
+        for scene in self.script.keys():
           print("\n----------------------------")
           print("ABOUT TO EXECUTE SCENE '%s'" % scene)
           if self.confirm_scene(scene):

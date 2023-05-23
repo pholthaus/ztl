@@ -13,14 +13,15 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "pyyaml",
+    "oyaml",
     "pyzmq"
 ]
 
 [project.scripts]
-simple_client = "ztl.example.simple_client:main_cli"
-simple_server = "ztl.example.simple_server:main_cli"
+ztl_simple_client = "ztl.example.simple_client:main_cli"
+ztl_simple_server = "ztl.example.simple_server:main_cli"
+ztl_run_script = "ztl.script.run_script:main_cli"
 
 [project.urls]
-"Homepage" = "https://gitlab.com/robothouse/rh-user/ztl"
-"Bug Tracker" = "https://gitlab.com/robothouse/rh-user/ztl/issues"
+"Homepage" = "https://gitlab.com/robothouse/rh-user/ztl/"
+"Bug Tracker" = "https://gitlab.com/robothouse/rh-user/ztl/issues/"
