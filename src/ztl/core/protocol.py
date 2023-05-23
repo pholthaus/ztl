@@ -44,7 +44,7 @@ class Task:
 
   @staticmethod
   def decode(message):
-    cmd = base64.b64decode(bytes(message, encoding='utf-8')).split(Task.SEPARATOR)
+    cmd = base64.b64decode(bytes(str(message).encode("utf-8"))).split(Task.SEPARATOR)
     return dict(zip(Task.FIELDS, cmd))
 
   @staticmethod
