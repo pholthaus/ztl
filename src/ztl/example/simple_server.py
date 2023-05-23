@@ -8,9 +8,9 @@ from ztl.core.task import SimpleTaskHandler
 
 def main_cli():
   scope = sys.argv[1]
-  run = TaskServer(5555)
-  run.register(scope, SimpleTaskHandler())
-  run.execute()
+  server = TaskServer(5555)
+  server.register(scope, SimpleTaskHandler())
+  server.listen()
   
 if __name__ == "__main__":
   
