@@ -4,7 +4,11 @@ import time
 from threading import Thread
 from ztl.core.protocol import State
 
-class Task(object):
+class ExecutableTask(object):
+
+  def initialise(self):
+    return True
+
 
   def execute(self):
     return True
@@ -14,18 +18,20 @@ class Task(object):
     return True
 
 
-class TimedTask(object):
+class TimedTask(ExecutableTask):
 
   def __init__(self, duration):
     self.active = True
     self.duration = duration
+
+  def initialise(self):
+    return True
 
   def execute(self):
     start = time.time()
     while self.active and time.time() - start < self.duration:
       time.sleep(.1)
     return self.active
-
 
   def abort(self):
     self.active = False
@@ -47,19 +53,24 @@ class TaskExecutor(Thread):
   def run(self):
     print("Initiating task...")
     self.task = self.cls(*self.parameters)
-    if not self._prevent:
-      print("Accepting and executing task...")
-      self._state = State.ACCEPTED
-      success = self.task.execute()
-      if success:
-        print("Task completed successfully.")
-        self._state = State.COMPLETED
+    success = self.task.init()
+    if success:
+      if not self._prevent:
+        print("Accepting and executing task...")
+        self._state = State.ACCEPTED
+        success = self.task.execute()
+        if success:
+          print("Task completed successfully.")
+          self._state = State.COMPLETED
+        else:
+          print("Task failed.")
+          self._state = State.FAILED
       else:
-        print("Task failed.")
         self._state = State.FAILED
+        logging.warn("Task execution prevented during initialising.")
     else:
-      self._state = State.FAILED
-      logging.warn("Task execution prevented during initialising.")
+      print("Rejecting task...")
+      self._state = State.REJECTED
 
 
   def stop(self):
@@ -97,7 +108,7 @@ class SimpleTaskHandler(object):
   def init(self, payload):
     self.current_id += 1
     print("Initialising Task ID '%s' (%s)..." % (self.current_id, payload))
-    self.running[self.current_id] = TaskExecutor(TimedTask,int(payload),)
+    self.running[self.current_id] = TaskExecutor(TimedTask, int(payload))
     return self.current_id, ""
 
   def status(self, mid, payload):
