@@ -53,7 +53,7 @@ class TaskExecutor(Thread):
   def run(self):
     print("Initiating task...")
     self.task = self.cls(*self.parameters)
-    success = self.task.init()
+    success = self.task.initialise()
     if success:
       if not self._prevent:
         print("Accepting and executing task...")
