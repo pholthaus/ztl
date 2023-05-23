@@ -16,6 +16,15 @@ class State:
   ABORTED = 4
   COMPLETED = 5
 
+  @staticmethod
+  def name(code):
+    if code == State.INITIATED: return "INITIATED"
+    if code == State.ACCEPTED: return "ACCEPTED"
+    if code == State.REJECTED: return "REJECTED"
+    if code == State.FAILED: return "FAILED"
+    if code == State.ABORTED: return "ABORTED"
+    if code == State.COMPLETED: return "COMPLETED"
+    return None
 
 class Message:
 
