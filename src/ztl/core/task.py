@@ -56,11 +56,7 @@ class TaskExecutor(Thread):
 
 
   def run(self):
-<<<<<<< HEAD
     self.logger.debug("Initiating task with parameters '%s'...", self.parameters)
-=======
-    self.logger.info("Initiating task with parameters '%s'...", self.parameters)
->>>>>>> ef1675f (use more logging)
     self.task = self.cls(*self.parameters)
     success = self.task.initialise()
     if success:
