@@ -22,6 +22,7 @@ class Message:
   SEPARATOR = ";"
   FIELDS = ["scope", "state", "id", "payload"]
 
+  @staticmethod
   def encode(scope, state, mid, payload):
     msg = {"scope": str(scope),
            "state": str(state),
@@ -29,6 +30,7 @@ class Message:
            "payload": str(payload)}
     return (msg["scope"] + Message.SEPARATOR  + msg["state"] + Message.SEPARATOR + msg["id"] + Message.SEPARATOR + msg["payload"]).encode('utf-8')
 
+  @staticmethod
   def decode(message):
     split = message.decode("utf-8").split(Message.SEPARATOR)
     unfolded = dict(zip(Message.FIELDS, split))
@@ -40,10 +42,12 @@ class Task:
   SEPARATOR = "^"
   FIELDS = ["handler", "component", "goal"]
 
+  @staticmethod
   def decode(message):
     cmd = base64.b64decode(bytes(message, encoding='utf-8')).split(Task.SEPARATOR)
     return dict(zip(Task.FIELDS, cmd))
 
+  @staticmethod
   def encode(handler, component, goal):
     joined = str(handler) + Task.SEPARATOR + str(component) + Task.SEPARATOR + str(goal)
     code = base64.b64encode(joined.encode('utf-8'))
