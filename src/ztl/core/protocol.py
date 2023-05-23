@@ -6,6 +6,12 @@ class Request:
   STATUS = 2
   ABORT = 3
 
+  @staticmethod
+  def name(code):
+    if code == Request.INIT: return "INIT"
+    if code == Request.STATUS: return "STATUS"
+    if code == Request.ABORT: return "ABORT"
+    return None
 
 class State:
 

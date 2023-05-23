@@ -2,12 +2,15 @@ import zmq
 import time
 import sys
 import logging
+logging.basicConfig(level=logging.INFO)
 
 from ztl.core.protocol import Message, Request, State
 
 class RemoteTask(object):
 
   def __init__(self, host, port, scope, timeout=2000):
+
+    self.logger = logging.getLogger('remote-task')
     self.context = zmq.Context()
     self.socket = self.context.socket(zmq.REQ)
     self.socket.setsockopt(zmq.RCVTIMEO, timeout)
@@ -15,7 +18,7 @@ class RemoteTask(object):
     self.socket.connect(address)
     self.scope = scope
 
-    print("Remote task interface initialised at " + address)
+    self.logger.info("Remote task interface initialised at '%s'.", address)
 
   def trigger(self, payload):
     """
@@ -35,7 +38,7 @@ class RemoteTask(object):
       reply = Message.decode(self.socket.recv())
       return int(reply["id"])
     except Exception as e:
-      logging.error(e)
+      self.logger.error(e)
       return -1
 
   def abort(self, mid, payload="abort command"):
@@ -57,7 +60,7 @@ class RemoteTask(object):
       reply = Message.decode(self.socket.recv())
       return int(reply["state"])
     except Exception as e:
-      logging.error(e)
+      self.logger.error(e)
       return -1
 
   def status(self, mid, payload="status update"):
@@ -79,7 +82,7 @@ class RemoteTask(object):
       reply = Message.decode(self.socket.recv())
       return int(reply["state"])
     except Exception as e:
-      logging.error(e)
+      self.logger.error(e)
       return -1
 
   def wait(self, mid, payload = "waiting poll", timeout = 5.0):

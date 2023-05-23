@@ -2,7 +2,6 @@ import time
 import logging
 logging.basicConfig(level=logging.INFO)
 
-
 from threading import Thread
 from ztl.core.protocol import State
 
@@ -43,6 +42,9 @@ class TimedTask(ExecutableTask):
 class TaskExecutor(Thread):
 
   def __init__(self, cls, *parameters):
+
+    self.logger = logging.getLogger(cls)
+
     Thread.__init__(self)
     self.logger = logging.getLogger(type(cls).__name__)
     self.cls = cls
@@ -54,7 +56,11 @@ class TaskExecutor(Thread):
 
 
   def run(self):
+<<<<<<< HEAD
     self.logger.debug("Initiating task with parameters '%s'...", self.parameters)
+=======
+    self.logger.info("Initiating task with parameters '%s'...", self.parameters)
+>>>>>>> ef1675f (use more logging)
     self.task = self.cls(*self.parameters)
     success = self.task.initialise()
     if success:

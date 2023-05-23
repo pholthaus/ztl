@@ -2,18 +2,20 @@ import zmq
 import time
 import sys
 import logging
+logging.basicConfig(level=logging.INFO)
 
 from ztl.core.protocol import Message, Request, State
 
 class TaskServer(object):
 
   def __init__(self, port):
+    self.logger = logging.getLogger('remote-task')
     context = zmq.Context()
     self.socket = context.socket(zmq.REP)
     address = "tcp://*:" + str(port)
     self.socket.bind(address)
     self.handlers = {}
-    print("Task Server listening at '%s'" % address)
+    self.logger.info("Task Server listening at '%s'" % address)
 
 
   def send_message(self, scope, mid, state, payload):
@@ -21,12 +23,13 @@ class TaskServer(object):
 
 
   def register(self, scope, handler):
-    print("Registering handler for scope '%s'." % scope)
+    self.logger.info("Registering handler for scope '%s'." % scope)
     self.handlers[scope] = handler
 
 
   def unregister(self, scope):
     self.handlers[scope] = None
+    self.logger.info("Handler for scope '%s' removed." % scope)
 
 
   def listen(self):
@@ -63,11 +66,11 @@ class TaskServer(object):
 
           else:
             self.send_message(scope, State.REJECTED, -1, "No handler for scope: " + scope)
-            print("No handler for scope '%s', ignoring." % scope)
+            self.logger.warning("No handler for scope '%s', ignoring." % scope)
 
         else:
           self.send_message(scope, State.REJECTED, -1, "Unknown protocol")
-          print("Unknown command received '%s', ignoring." % message)
+          self.logger.warning("Unknown command received '%s', ignoring." % message)
 
       except Exception as e:
         logging.error(e)
