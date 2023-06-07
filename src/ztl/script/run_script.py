@@ -50,19 +50,19 @@ class ScriptExecutor(object):
     return name, delay, wait
 
   def execute_scene(self, scene):
-    
+
     scene_name, scene_delay, scene_wait = self.parse_stage(scene)
     steps = list(self.script[scene].keys())
 
-    print(("EXECUTING SCENE '%s'" % scene_name) + (" IN BACKGROUND" if not scene_wait else "") + (" WITH DELAY %ss" % scene_delay if scene_delay > 0 else "") + "...")
-    
+    print(("EXECUTING SCENE '%s'" % scene_name) + (" WITH DELAY %ss" % scene_delay if scene_delay > 0 else "") + "...")
+
     if scene_delay > 0:
       time.sleep(scene_delay)
-    
+
     for step in steps:
       step_name, step_delay, step_wait = self.parse_stage(step)
       print(("STARTING STEP '%s'" % step_name) + (" IN BACKGROUND" if not step_wait else "") + (" WITH DELAY %ss" % step_delay if step_delay > 0 else "") + "...")
-      
+
       if step_delay > 0:
         time.sleep(step_delay)
 
@@ -85,26 +85,22 @@ class ScriptExecutor(object):
         else:
           self.logger.error("No remote for handler '%s'. Step '%s' COULD NOT BE TRIGGERED." % (handler, step_name))
 
-      if scene_wait: # THIS IS NOT CORRECT YET - needs to wait for the whole scene and not each step (currently all steps are left alone instead of waiting for them to complete)
-        running = True
-        while running:
-          running = False
-          for task_id in task_ids:
-            components = task_id.split(":")
-            remote_id = int(components[0])
-            rid = components[1]
-            status = self.client[rid].wait(remote_id, task_id, timeout=100)
-            running = running or status <= State.ACCEPTED
-          time.sleep(.1)
-      else:
-        # MOVE TO DEBUG AFTER FINISHING THIS FEATURE
-        self.logger.info("SCENE '%s' TRIGGERED TO RUN IN BACKGROUND." % (scene_name))
+      running = True
+      while running:
+        running = False
+        for task_id in task_ids:
+          components = task_id.split(":")
+          remote_id = int(components[0])
+          rid = components[1]
+          status = self.client[rid].wait(remote_id, task_id, timeout=100)
+          running = running or status <= State.ACCEPTED
+        time.sleep(.1)
 
 
   def confirm_scene(self, scene):
     print("\n----------------------------")
     print("ABOUT TO EXECUTE SCENE '%s'" % scene)
-    
+
     steps = list(self.script[scene].keys())
 
     for step in steps:
