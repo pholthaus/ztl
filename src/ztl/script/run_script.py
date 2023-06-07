@@ -29,11 +29,42 @@ class ScriptExecutor(object):
     with open(scriptfile) as f:
       self.script = yaml.safe_load(f)
 
+  def parse_stage(self, stage):
+    name = stage
+    delay = 0
+    wait = True
+    o = stage.find("(")
+    c = stage.find(")")
+    if o > 0 and c > 0:
+      params = stage[o+1:c]
+      name = stage[0:o]
+      for param in params.split(","):
+        pp = param.split("=")
+        if len(pp) is 2:
+          key = pp[0]
+          value = pp[1]
+          if key == "delay":
+            delay = int(value)
+          if key == "wait":
+            wait = value.lower() in ['true', '1', 't', 'y', 'yes']
+    return name, delay, wait
 
   def execute_scene(self, scene):
+    
+    scene_name, scene_delay, scene_wait = self.parse_stage(scene)
     steps = list(self.script[scene].keys())
+
+    print(("EXECUTING SCENE '%s'" % scene_name) + (" IN BACKGROUND" if not scene_wait else "") + (" WITH DELAY %ss" % scene_delay if scene_delay > 0 else "") + "...")
+    
+    if scene_delay > 0:
+      time.sleep(scene_delay)
+    
     for step in steps:
-      print("STARTING STEP '%s'" % step)
+      step_name, step_delay, step_wait = self.parse_stage(step)
+      print(("STARTING STEP '%s'" % step_name) + (" IN BACKGROUND" if not step_wait else "") + (" WITH DELAY %ss" % step_delay if step_delay > 0 else "") + "...")
+      
+      if step_delay > 0:
+        time.sleep(step_delay)
 
       task_ids = []
       handlers = self.script[scene][step].keys()
@@ -42,27 +73,38 @@ class ScriptExecutor(object):
           components = self.script[scene][step][handler].keys()
           for component in components:
             goal = self.script[scene][step][handler][component]
-            remote_id = self.tasks[handler].trigger(Task.encode(handler, component, goal))
+            remote_id = 1 # self.tasks[handler].trigger(Task.encode(handler, component, goal)) # MAKE THIS CORRECT AGAIN!
             if remote_id > 0:
-              task_ids.append(str(remote_id) + ":" + str(handler) + ":" + str(component) + ":" + str(goal))
+              if step_wait:
+                task_ids.append(str(remote_id) + ":" + str(handler) + ":" + str(component) + ":" + str(goal))
+              else:
+                # MOVE TO DEBUG AFTER FINISHING THIS FEATURE
+                self.logger.info("Component '%s' on handler '%s' for step '%s' TRIGGERED TO RUN IN BACKGROUND." % (component, handler, step_name))
             else:
-              self.logger.error("Component '%s' on handler '%s' for step '%s' COULD NOT BE TRIGGERED." % (component, handler, step))
+              self.logger.error("Component '%s' on handler '%s' for step '%s' COULD NOT BE TRIGGERED." % (component, handler, step_name))
         else:
-          self.logger.error("No remote for handler '%s'. Step '%s' COULD NOT BE TRIGGERED." % (handler, step))
+          self.logger.error("No remote for handler '%s'. Step '%s' COULD NOT BE TRIGGERED." % (handler, step_name))
 
-      running = True
-      while running:
-        running = False
-        for task_id in task_ids:
-          components = task_id.split(":")
-          remote_id = int(components[0])
-          rid = components[1]
-          status = self.client[rid].wait(remote_id, task_id, timeout=100)
-          running = running or status <= State.ACCEPTED
-        time.sleep(.1)
+      if scene_wait: # THIS IS NOT CORRECT YET - needs to wait for the whole scene and not each step (currently all steps are left alone instead of waiting for them to complete)
+        running = True
+        while running:
+          running = False
+          for task_id in task_ids:
+            components = task_id.split(":")
+            remote_id = int(components[0])
+            rid = components[1]
+            status = self.client[rid].wait(remote_id, task_id, timeout=100)
+            running = running or status <= State.ACCEPTED
+          time.sleep(.1)
+      else:
+        # MOVE TO DEBUG AFTER FINISHING THIS FEATURE
+        self.logger.info("SCENE '%s' TRIGGERED TO RUN IN BACKGROUND." % (scene_name))
 
 
   def confirm_scene(self, scene):
+    print("\n----------------------------")
+    print("ABOUT TO EXECUTE SCENE '%s'" % scene)
+    
     steps = list(self.script[scene].keys())
 
     for step in steps:
@@ -82,10 +124,7 @@ class ScriptExecutor(object):
   def execute(self):
     try:
         for scene in self.script.keys():
-          print("\n----------------------------")
-          print("ABOUT TO EXECUTE SCENE '%s'" % scene)
           if self.confirm_scene(scene):
-            print("EXECUTING SCENE '%s'" % scene)
             self.execute_scene(scene)
           else:
             print("\nSKIPPING SCENE '%s'" % (scene))

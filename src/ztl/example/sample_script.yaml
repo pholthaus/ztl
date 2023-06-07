@@ -1,0 +1,18 @@
+provide_food(delay=1,wait=False):
+  cob_position(delay=1):
+    cob:
+      base: cob_present
+    fetch:
+      base: fetch_server
+  address audience:
+    cob:
+      tts: cob_drink_prompt
+  move_robots:
+    cob:
+      base: fetch_sofa
+  tts_recognise:
+    cob:
+      tts: cob_recognise
+  tts_list_items:
+    cob:
+      tts: cob_list_items
