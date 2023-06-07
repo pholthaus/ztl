@@ -41,8 +41,8 @@ class ScriptExecutor(object):
       for param in params.split(","):
         pp = param.split("=")
         if len(pp) is 2:
-          key = pp[0]
-          value = pp[1]
+          key = pp[0].strip()
+          value = pp[1].strip()
           if key == "delay":
             delay = int(value)
           if key == "wait":

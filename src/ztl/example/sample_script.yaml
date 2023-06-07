@@ -1,18 +1,18 @@
-provide_food(delay=1,wait=False):
-  cob_position(delay=1):
+provide food (delay = 2):
+  cob position(delay = 1, wait = False):
     cob:
       base: cob_present
     fetch:
       base: fetch_server
-  address audience:
+  address audience(wait=False):
     cob:
       tts: cob_drink_prompt
-  move_robots:
+  move robots(delay  = 2):
     cob:
       base: fetch_sofa
-  tts_recognise:
+  tts recognise:
     cob:
       tts: cob_recognise
-  tts_list_items:
+  tts list:
     cob:
       tts: cob_list_items
