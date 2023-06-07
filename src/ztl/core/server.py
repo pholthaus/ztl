@@ -23,17 +23,36 @@ class TaskServer(object):
 
 
   def register(self, scope, handler):
+    """
+    Register a new handler for requests on a specific scope.
+
+    Parameters
+    ----------
+    scope: The scope for which the server should dispatch tasks to the handler. Will replace any existing handler for this scope.
+    handler: A handler object that will be called with requests (init, status, abort)
+    """
+
     self.logger.info("Registering handler for scope '%s'." % scope)
     self.handlers[scope] = handler
 
 
   def unregister(self, scope):
+    """
+    Unregister any handler on a given scope.
+
+    Parameters
+    ----------
+    scope: The scope for which the server should not dispatch tasks any longer.
+    """
     self.handlers[scope] = None
     self.logger.info("Handler for scope '%s' removed." % scope)
 
 
   def listen(self):
+    """
+    Begin listening to requests and dispatching them to any handlers if available. This method blocks until interrupted.
 
+    """
     while True:
       try:
         message = self.socket.recv()
@@ -75,3 +94,6 @@ class TaskServer(object):
       except Exception as e:
         logging.error(e)
         time.sleep(1)
+      except KeyboardInterrupt:
+        logging.error("Interrupted, exiting.")
+        exit(1)
