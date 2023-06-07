@@ -73,7 +73,7 @@ class ScriptExecutor(object):
           components = self.script[scene][step][handler].keys()
           for component in components:
             goal = self.script[scene][step][handler][component]
-            remote_id = 1 # self.tasks[handler].trigger(Task.encode(handler, component, goal)) # MAKE THIS CORRECT AGAIN!
+            remote_id = self.tasks[handler].trigger(Task.encode(handler, component, goal))
             if remote_id > 0:
               if step_wait:
                 task_ids.append(str(remote_id) + ":" + str(handler) + ":" + str(component) + ":" + str(goal))
