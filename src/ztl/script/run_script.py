@@ -72,16 +72,21 @@ class ScriptExecutor(object):
         if handler in self.tasks:
           components = self.script[scene][step][handler].keys()
           for component in components:
+            component_name, component_delay, component_wait = self.parse_stage(component)
             goal = self.script[scene][step][handler][component]
-            remote_id = self.tasks[handler].trigger(Task.encode(handler, component, goal))
+
+            if component_delay > 0:
+              time.sleep(component_delay)
+
+            remote_id = self.tasks[handler].trigger(Task.encode(handler, component_name, goal))
             if remote_id > 0:
-              if step_wait:
-                task_ids.append(str(remote_id) + ":" + str(handler) + ":" + str(component) + ":" + str(goal))
+              if step_wait and component_wait:
+                task_ids.append(str(remote_id) + ":" + str(handler) + ":" + str(component_name) + ":" + str(goal))
               else:
                 # MOVE TO DEBUG AFTER FINISHING THIS FEATURE
-                self.logger.info("Component '%s' on handler '%s' for step '%s' TRIGGERED TO RUN IN BACKGROUND." % (component, handler, step_name))
+                self.logger.info("Component '%s' on handler '%s' for step '%s' TRIGGERED TO RUN IN BACKGROUND." % (component_name, handler, step_name))
             else:
-              self.logger.error("Component '%s' on handler '%s' for step '%s' COULD NOT BE TRIGGERED." % (component, handler, step_name))
+              self.logger.error("Component '%s' on handler '%s' for step '%s' COULD NOT BE TRIGGERED." % (component_name, handler, step_name))
         else:
           self.logger.error("No remote for handler '%s'. Step '%s' COULD NOT BE TRIGGERED." % (handler, step_name))
 
@@ -92,7 +97,7 @@ class ScriptExecutor(object):
           components = task_id.split(":")
           remote_id = int(components[0])
           rid = components[1]
-          status = self.client[rid].wait(remote_id, task_id, timeout=100)
+          status = self.tasks[rid].wait(remote_id, task_id, timeout=100)
           running = running or status <= State.ACCEPTED
         time.sleep(.1)
 
