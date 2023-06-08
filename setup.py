@@ -10,4 +10,8 @@ setup(name='ztl',
       url='https://gitlab.com/robothouse/rh-user/ztl/',
       package_dir={'':'src'},
       packages=['ztl', 'ztl.core', 'ztl.example', 'ztl.script'],
-     )
+      scripts=['src/ztl/example/simple_client.py',
+            'src/ztl/example/simple_server.py',
+            'src/ztl/script/run_script.py'
+      ]
+)
