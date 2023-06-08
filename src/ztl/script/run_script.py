@@ -30,14 +30,15 @@ class ScriptExecutor(object):
       self.script = yaml.safe_load(f)
 
   def parse_stage(self, stage):
-    name = stage
+    name = str(stage)
     delay = 0
     wait = True
-    o = stage.find("(")
-    c = stage.find(")")
+
+    o = name.find("(")
+    c = name.find(")")
     if o > 0 and c > 0:
-      params = stage[o+1:c]
-      name = stage[0:o]
+      params = name[o+1:c]
+      name = name[0:o]
       for param in params.split(","):
         pp = param.split("=")
         if len(pp) is 2:
