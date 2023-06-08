@@ -42,9 +42,6 @@ class TimedTask(ExecutableTask):
 class TaskExecutor(Thread):
 
   def __init__(self, cls, *parameters):
-
-    self.logger = logging.getLogger(cls)
-
     Thread.__init__(self)
     self.logger = logging.getLogger(type(cls).__name__)
     self.cls = cls
