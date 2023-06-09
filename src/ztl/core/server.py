@@ -82,10 +82,10 @@ class TaskServer(object):
                 status, response = handler.abort(mid, payload)
                 self.send_message(scope, status, mid, response)
               else:
-                self.send_message(scope, State.REJECTED, mid, "Invalid state")
+                self.send_message(scope, State.REJECTED, mid, "Invalid request")
             except Exception as e:
               logging.error(e)
-              self.send_message(scope, State.FAILED, -1, "Handler threw exception: " + str(e))
+              self.send_message(scope, State.FAILED, mid, "Handler threw exception: " + str(e))
           else:
             self.send_message(scope, State.REJECTED, -1, "No handler for scope: " + scope)
             self.logger.warning("No handler for scope '%s', ignoring." % scope)
