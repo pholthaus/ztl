@@ -1,9 +1,9 @@
-import time
 import logging
 logging.basicConfig(level=logging.INFO)
 
 from threading import Thread
 from ztl.core.protocol import State
+
 
 class ExecutableTask(object):
 
@@ -17,6 +17,20 @@ class ExecutableTask(object):
 
   def abort(self):
     return True
+
+
+class TaskHandler(object):
+
+  def init(self, payload):
+    return -1, "Not implemented"
+
+
+  def status(self, mid, payload):
+      return State.REJECTED, "Not implemented"
+
+
+  def abort(self, mid, payload):
+    return State.REJECTED, "Not implemented"
 
 
 class TaskExecutor(Thread):

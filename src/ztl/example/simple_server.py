@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 
 import sys
+import time
 
 from ztl.core.server import TaskServer
 from ztl.core.protocol import State
-from ztl.core.task import ExecutableTask, TaskExecutor
+from ztl.core.task import ExecutableTask, TaskExecutor, TaskHandler
 
 
-class TimedTask(ExecutableTask):
+class DummyTask(ExecutableTask):
 
   def __init__(self, duration):
     self.active = True
@@ -27,7 +28,7 @@ class TimedTask(ExecutableTask):
     return True
 
 
-class SimpleTaskHandler(object):
+class SimpleTaskHandler(TaskHandler):
 
   def __init__(self):
     self.current_id = 0
@@ -36,7 +37,7 @@ class SimpleTaskHandler(object):
   def init(self, payload):
     self.current_id += 1
     print("Initialising Task ID '%s' (%s)..." % (self.current_id, payload))
-    self.running[self.current_id] = TaskExecutor(TimedTask, int(payload))
+    self.running[self.current_id] = TaskExecutor(DummyTask, int(payload))
     return self.current_id, ""
 
   def status(self, mid, payload):
