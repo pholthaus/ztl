@@ -19,26 +19,6 @@ class ExecutableTask(object):
     return True
 
 
-class TimedTask(ExecutableTask):
-
-  def __init__(self, duration):
-    self.active = True
-    self.duration = duration
-
-  def initialise(self):
-    return True
-
-  def execute(self):
-    start = time.time()
-    while self.active and time.time() - start < self.duration:
-      time.sleep(.1)
-    return self.active
-
-  def abort(self):
-    self.active = False
-    return True
-
-
 class TaskExecutor(Thread):
 
   def __init__(self, cls, *parameters):
@@ -99,33 +79,3 @@ class TaskExecutor(Thread):
 
   def state(self):
     return self._state
-
-
-class SimpleTaskHandler(object):
-
-  def __init__(self):
-    self.current_id = 0
-    self.running = {}
-
-  def init(self, payload):
-    self.current_id += 1
-    print("Initialising Task ID '%s' (%s)..." % (self.current_id, payload))
-    self.running[self.current_id] = TaskExecutor(TimedTask, int(payload))
-    return self.current_id, ""
-
-  def status(self, mid, payload):
-    if mid in self.running:
-      print("Status Task ID '%s' (%s)..." % (mid, payload))
-      return self.running[mid].state(), mid 
-    else:
-      return State.REJECTED, "Invalid ID"
-
-
-  def abort(self, mid, payload):
-    if mid in self.running:
-      print("Aborting Task ID '%s' (%s)..." % (mid, payload))
-      return self.running[mid].stop(), mid
-    else:
-      return State.REJECTED, "Invalid ID"
-
-
