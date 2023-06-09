@@ -68,21 +68,24 @@ class TaskServer(object):
             mid = int(request["id"])
             payload = request["payload"]
 
-            if state == Request.INIT:
-              ticket, response = handler.init(payload)
-              if ticket > 0:
-                self.send_message(scope, State.ACCEPTED, ticket, response)
+            try:
+              if state == Request.INIT:
+                ticket, response = handler.init(payload)
+                if ticket > 0:
+                  self.send_message(scope, State.ACCEPTED, ticket, response)
+                else:
+                  self.send_message(scope, State.REJECTED, ticket, response)
+              elif state == Request.STATUS:
+                status, response = handler.status(mid, payload)
+                self.send_message(scope, status, mid, response)
+              elif state == Request.ABORT:
+                status, response = handler.abort(mid, payload)
+                self.send_message(scope, status, mid, response)
               else:
-                self.send_message(scope, State.REJECTED, ticket, response)
-            elif state == Request.STATUS:
-              status, response = handler.status(mid, payload)
-              self.send_message(scope, status, mid, response)
-            elif state == Request.ABORT:
-              status, response = handler.abort(mid, payload)
-              self.send_message(scope, status, mid, response)
-            else:
-              self.send_message(scope, State.REJECTED, mid, "Invalid state")
-
+                self.send_message(scope, State.REJECTED, mid, "Invalid state")
+            except Exception as e:
+              logging.error(e)
+              self.send_message(scope, State.FAILED, -1, "Handler threw exception: " + str(e))
           else:
             self.send_message(scope, State.REJECTED, -1, "No handler for scope: " + scope)
             self.logger.warning("No handler for scope '%s', ignoring." % scope)
@@ -96,4 +99,4 @@ class TaskServer(object):
         time.sleep(1)
       except KeyboardInterrupt:
         logging.error("Interrupted, exiting.")
-        exit(1)
+        sys.exit(1)
