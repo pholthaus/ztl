@@ -47,7 +47,7 @@ class ScriptExecutor(object):
           if key == "delay":
             delay = int(value)
           if key == "wait":
-            wait = value.lower() in ['true', '1', 't', 'y', 'yes']
+            wait = value.lower() in ['true', '1', 't', 'y', 'yes', 'on']
     return name, delay, wait
 
   def execute_scene(self, scene):
