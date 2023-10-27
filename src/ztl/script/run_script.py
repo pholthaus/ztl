@@ -5,10 +5,6 @@ import oyaml as yaml
 import argparse
 import os
 import logging
-if os.name == 'posix':
-  from getch import getch
-elif os.name == 'nt':
-  from msvcrt import getch
 
 logging.basicConfig(level=logging.INFO)
 
@@ -16,12 +12,48 @@ from sys import stdin, exit
 from ztl.core.protocol import State, Task
 from ztl.core.client import RemoteTask
 
+class _Getch:
+    """Gets a single character from standard input.  Does not echo to the
+screen."""
+    def __init__(self):
+        try:
+            self.impl = _GetchWindows()
+        except ImportError:
+            self.impl = _GetchUnix()
+
+    def __call__(self): return self.impl()
+
+class _GetchUnix:
+    def __init__(self):
+        import tty, sys
+
+    def __call__(self):
+        import sys, tty, termios
+        fd = sys.stdin.fileno()
+        old_settings = termios.tcgetattr(fd)
+        try:
+            tty.setraw(sys.stdin.fileno())
+            ch = sys.stdin.read(1)
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+        return ch
+
+class _GetchWindows:
+    def __init__(self):
+        import msvcrt
+
+    def __call__(self):
+        import msvcrt
+        return msvcrt.getch()
+
 class ScriptExecutor(object):
 
   tasks = {}
 
   def __init__(self, configfile, scriptfile):
     self.logger = logging.getLogger('script-exec')
+
+    self.getch = _Getch()
 
     self.lastScene = None
 
@@ -133,7 +165,7 @@ class ScriptExecutor(object):
       return self.get_key()
   
   def get_key(self):
-    first_char = getch()
+    first_char = self.getch()
     # The idea would be to allow further decomposition of the getch e.g. if arrows keys are pressed
     return first_char
 
@@ -143,7 +175,7 @@ class ScriptExecutor(object):
           repeat = True
           while repeat:
             keyPressed = self.confirm_scene(scene)
-            if keyPressed == "\n" or keyPressed == b"\r":
+            if keyPressed == "\r" or keyPressed == b"\r":
               self.execute_scene(scene)
               self.lastScene = scene
               repeat = False
