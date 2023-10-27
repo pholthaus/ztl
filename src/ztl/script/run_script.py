@@ -143,11 +143,11 @@ class ScriptExecutor(object):
           repeat = True
           while repeat:
             keyPressed = self.confirm_scene(scene)
-            if keyPressed == "\n":
+            if keyPressed == "\n" or keyPressed == b"\r":
               self.execute_scene(scene)
               self.lastScene = scene
               repeat = False
-            elif self.lastScene != None and (keyPressed == "r" or keyPressed == "R"):
+            elif self.lastScene != None and (keyPressed == "r" or keyPressed == "R" or keyPressed == b"r" or keyPressed == b"R"):
               print("\n Repeating Scene '%s" % (self.lastScene))
               self.execute_scene(self.lastScene)
             else:
