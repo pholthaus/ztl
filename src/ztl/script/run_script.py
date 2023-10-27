@@ -5,6 +5,11 @@ import oyaml as yaml
 import argparse
 import os
 import logging
+if os.name == 'posix':
+  from getch import getch
+elif os.name == 'nt':
+  from msvcrt import getch
+
 logging.basicConfig(level=logging.INFO)
 
 from sys import stdin, exit
@@ -17,6 +22,8 @@ class ScriptExecutor(object):
 
   def __init__(self, configfile, scriptfile):
     self.logger = logging.getLogger('script-exec')
+
+    self.lastScene = None
 
     with open(configfile) as f:
       self.config = yaml.safe_load(f)
@@ -118,18 +125,34 @@ class ScriptExecutor(object):
           goal = self.script[scene][step][handler][component]
           print("\t%s [%s]: -> %s" % (handler, component, goal))
 
-    print("PRESS <ENTER> TO CONFIRM or ANY OTHER KEY TO SKIP")
-    input = stdin.readline()
-    return input == "\n"
-
+    if self.lastScene == None:
+      print("PRESS <ENTER> TO CONFIRM or ANY OTHER KEY TO SKIP")
+      return self.get_key()
+    else:
+      print("PRESS <ENTER> TO CONFIRM, PRESS <R> TO REPLAY LAST SCENE OR ANY OTHER KEY TO SKIP")
+      return self.get_key()
+  
+  def get_key(self):
+    first_char = getch()
+    # The idea would be to allow further decomposition of the getch e.g. if arrows keys are pressed
+    return first_char
 
   def execute(self):
     try:
         for scene in self.script.keys():
-          if self.confirm_scene(scene):
-            self.execute_scene(scene)
-          else:
-            print("\nSKIPPING SCENE '%s'" % (scene))
+          repeat = True
+          while repeat:
+            keyPressed = self.confirm_scene(scene)
+            if keyPressed == "\n":
+              self.execute_scene(scene)
+              self.lastScene = scene
+              repeat = False
+            elif self.lastScene != None and (keyPressed == "r" or keyPressed == "R"):
+              print("\n Repeating Scene '%s" % (self.lastScene))
+              self.execute_scene(self.lastScene)
+            else:
+              print("\nSKIPPING SCENE '%s'" % (scene))
+              repeat = False
 
     except Exception as e:
       self.logger.error(e)

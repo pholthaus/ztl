@@ -1,2 +1,4 @@
 oyaml
 pyzmq
+getch
+msvcrt
