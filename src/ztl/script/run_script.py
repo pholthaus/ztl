@@ -5,11 +5,46 @@ import oyaml as yaml
 import argparse
 import os
 import logging
+
 logging.basicConfig(level=logging.INFO)
 
 from sys import stdin, exit
 from ztl.core.protocol import State, Task
 from ztl.core.client import RemoteTask
+
+class _Getch:
+    """Gets a single character from standard input.  Does not echo to the
+screen."""
+    def __init__(self):
+        try:
+            self.impl = _GetchWindows()
+        except ImportError:
+            self.impl = _GetchUnix()
+
+    def __call__(self): return self.impl()
+
+class _GetchUnix:
+    def __init__(self):
+        import tty, sys
+
+    def __call__(self):
+        import sys, tty, termios
+        fd = sys.stdin.fileno()
+        old_settings = termios.tcgetattr(fd)
+        try:
+            tty.setraw(sys.stdin.fileno())
+            ch = sys.stdin.read(1)
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+        return ch
+
+class _GetchWindows:
+    def __init__(self):
+        import msvcrt
+
+    def __call__(self):
+        import msvcrt
+        return msvcrt.getch()
 
 class ScriptExecutor(object):
 
@@ -17,6 +52,10 @@ class ScriptExecutor(object):
 
   def __init__(self, configfile, scriptfile):
     self.logger = logging.getLogger('script-exec')
+
+    self.getch = _Getch()
+
+    self.lastScene = None
 
     with open(configfile) as f:
       self.config = yaml.safe_load(f)
@@ -118,18 +157,34 @@ class ScriptExecutor(object):
           goal = self.script[scene][step][handler][component]
           print("\t%s [%s]: -> %s" % (handler, component, goal))
 
-    print("PRESS <ENTER> TO CONFIRM or ANY OTHER KEY TO SKIP")
-    input = stdin.readline()
-    return input == "\n"
-
+    if self.lastScene == None:
+      print("PRESS <ENTER> TO CONFIRM or ANY OTHER KEY TO SKIP")
+      return self.get_key()
+    else:
+      print("PRESS <ENTER> TO CONFIRM, PRESS <R> TO REPLAY LAST SCENE OR ANY OTHER KEY TO SKIP")
+      return self.get_key()
+  
+  def get_key(self):
+    first_char = self.getch()
+    # The idea would be to allow further decomposition of the getch e.g. if arrows keys are pressed
+    return first_char
 
   def execute(self):
     try:
         for scene in self.script.keys():
-          if self.confirm_scene(scene):
-            self.execute_scene(scene)
-          else:
-            print("\nSKIPPING SCENE '%s'" % (scene))
+          repeat = True
+          while repeat:
+            keyPressed = self.confirm_scene(scene)
+            if keyPressed == "\r" or keyPressed == b"\r":
+              self.execute_scene(scene)
+              self.lastScene = scene
+              repeat = False
+            elif self.lastScene != None and (keyPressed == "r" or keyPressed == "R" or keyPressed == b"r" or keyPressed == b"R"):
+              print("\n Repeating Scene '%s" % (self.lastScene))
+              self.execute_scene(self.lastScene)
+            else:
+              print("\nSKIPPING SCENE '%s'" % (scene))
+              repeat = False
 
     except Exception as e:
       self.logger.error(e)
