@@ -171,20 +171,36 @@ class ScriptExecutor(object):
 
   def execute(self):
     try:
-        for scene in self.script.keys():
+        restart = True
+        while restart:
+          for scene in self.script.keys():
+            repeat = True
+            while repeat:
+              keyPressed = self.confirm_scene(scene)
+              if keyPressed == "\r" or keyPressed == b"\r":
+                self.execute_scene(scene)
+                self.lastScene = scene
+                repeat = False
+              elif self.lastScene != None and (keyPressed == "r" or keyPressed == "R" or keyPressed == b"r" or keyPressed == b"R"):
+                print("\n Repeating Scene '%s" % (self.lastScene))
+                self.execute_scene(self.lastScene)
+              else:
+                print("\nSKIPPING SCENE '%s'" % (scene))
+                repeat = False
           repeat = True
           while repeat:
-            keyPressed = self.confirm_scene(scene)
-            if keyPressed == "\r" or keyPressed == b"\r":
-              self.execute_scene(scene)
-              self.lastScene = scene
-              repeat = False
-            elif self.lastScene != None and (keyPressed == "r" or keyPressed == "R" or keyPressed == b"r" or keyPressed == b"R"):
-              print("\n Repeating Scene '%s" % (self.lastScene))
-              self.execute_scene(self.lastScene)
+            print("PRESS <R> TO REPLAY THE LAST SCENE, PRESS <A> to restart the script OR ANY OTHER KEY TO EXIT")
+            keyPressed = self.get_key()
+            if self.lastScene != None and (keyPressed == "r" or keyPressed == "R" or keyPressed == b"r" or keyPressed == b"R"):
+                  print("\n Repeating Scene '%s" % (self.lastScene))
+                  self.execute_scene(self.lastScene)
+            elif self.lastScene != None and (keyPressed == "a" or keyPressed == "A" or keyPressed == b"a" or keyPressed == b"A"):
+                  print("\n Repeating Script")
+                  repeat = False
+                  restart = True
             else:
-              print("\nSKIPPING SCENE '%s'" % (scene))
-              repeat = False
+               repeat = False
+               restart = False
 
     except Exception as e:
       self.logger.error(e)
