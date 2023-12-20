@@ -189,6 +189,7 @@ class ScriptExecutor(object):
                 repeat = False
           if self.lastScene == None:
             print("PRESS <A> TO RESTART THE SCRIPT OR ANY OTHER KEY TO EXIT")
+            keyPressed = self.get_key()
             if self.lastScene != None and (keyPressed == "a" or keyPressed == "A" or keyPressed == b"a" or keyPressed == b"A"):
               print("\n Repeating Script")
               restart = True
