@@ -190,7 +190,7 @@ class ScriptExecutor(object):
           if self.lastScene == None:
             print("PRESS <A> TO RESTART THE SCRIPT OR ANY OTHER KEY TO EXIT")
             keyPressed = self.get_key()
-            if self.lastScene != None and (keyPressed == "a" or keyPressed == "A" or keyPressed == b"a" or keyPressed == b"A"):
+            if keyPressed == "a" or keyPressed == "A" or keyPressed == b"a" or keyPressed == b"A":
               print("\n Repeating Script")
               restart = True
             else:
@@ -203,7 +203,7 @@ class ScriptExecutor(object):
               if self.lastScene != None and (keyPressed == "r" or keyPressed == "R" or keyPressed == b"r" or keyPressed == b"R"):
                     print("\n Repeating Scene '%s" % (self.lastScene))
                     self.execute_scene(self.lastScene)
-              elif self.lastScene != None and (keyPressed == "a" or keyPressed == "A" or keyPressed == b"a" or keyPressed == b"A"):
+              elif keyPressed == "a" or keyPressed == "A" or keyPressed == b"a" or keyPressed == b"A":
                     print("\n Repeating Script")
                     repeat = False
                     restart = True
