@@ -210,7 +210,7 @@ class ScriptExecutor(object):
               else:
                 repeat = False
                 restart = False
-
+          self.lastScene = None
     except Exception as e:
       self.logger.error(e)
       exit(1)
