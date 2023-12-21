@@ -12,6 +12,38 @@ from sys import stdin, exit
 from ztl.core.protocol import State, Task
 from ztl.core.client import RemoteTask
 
+class Option:
+    
+  def __init__(self):
+    self.name = ""
+    self.scene_name = ""
+    # KeyboardKey:StepName
+    self.keys = {}
+    # KeyboardKey:StepDict
+    self.steps = {}
+    self.script = {}
+
+  def add_option(self, key, stepName, stepDict):
+      self.keys[key.lower()] = stepName
+      self.steps[key.lower()] = stepDict
+   
+  def print_option(self):
+     print("")
+     for key in self.keys:
+        print("PRESS <%s> TO RUN STEP: %s" % (key.lower(), self.keys[key]))
+        handlers = self.script[self.scene_name][self.keys[key]].keys()
+        for handler in handlers:
+          components = self.script[self.scene_name][self.keys[key]][handler].keys()
+          for component in components:
+            goal = self.script[self.scene_name][self.keys[key]][handler][component]
+            print("\t%s [%s]: -> %s" % (handler, component, goal))
+
+  def keyboardSelect(self, keyPressed):
+    if keyPressed.lower() in self.keys:
+      return self.keys[keyPressed.lower()]
+    else:
+      return None
+
 class _Getch:
     """Gets a single character from standard input.  Does not echo to the
 screen."""
@@ -44,7 +76,7 @@ class _GetchWindows:
 
     def __call__(self):
         import msvcrt
-        return msvcrt.getch()
+        return msvcrt.getch().decode('ASCII')
 
 class ScriptExecutor(object):
 
@@ -72,6 +104,7 @@ class ScriptExecutor(object):
     name = str(stage)
     delay = 0
     wait = True
+    option = None
 
     o = name.find("(")
     c = name.find(")")
@@ -87,12 +120,27 @@ class ScriptExecutor(object):
             delay = int(value)
           if key == "wait":
             wait = value.lower() in ['true', '1', 't', 'y', 'yes', 'on']
-    return name, delay, wait
+          if key == "option":
+            option = value.split(":")
+    return name, delay, wait, option
 
   def execute_scene(self, scene):
 
-    scene_name, scene_delay, scene_wait = self.parse_stage(scene)
+    step_option_dict = {}
+
+    scene_name, scene_delay, scene_wait, _ = self.parse_stage(scene)
     steps = list(self.script[scene].keys())
+    for step in steps:
+      _, _, _, step_option = self.parse_stage(step)
+      if not step_option == None:
+        if step_option[0] in step_option_dict:
+          step_option_dict[step_option[0]].add_option(step_option[1], step, self.script[scene][step])
+        else:
+          step_option_dict[step_option[0]] = Option()
+          step_option_dict[step_option[0]].name = step_option[0]
+          step_option_dict[step_option[0]].script = self.script
+          step_option_dict[step_option[0]].scene_name = scene
+          step_option_dict[step_option[0]].add_option(step_option[1], step, self.script[scene][step])
 
     print(("EXECUTING SCENE '%s'" % scene_name) + (" WITH DELAY %ss" % scene_delay if scene_delay > 0 else "") + "...")
 
@@ -100,7 +148,24 @@ class ScriptExecutor(object):
       time.sleep(scene_delay)
 
     for step in steps:
-      step_name, step_delay, step_wait = self.parse_stage(step)
+      step_name, step_delay, step_wait, step_option = self.parse_stage(step)
+
+      if not step_option == None:
+        if step_option[0] in step_option_dict:
+          print(step_option_dict[step_option[0]].name)
+          step_option_dict[step_option[0]].print_option()
+          option_step = step_option_dict[step_option[0]].keyboardSelect(self.get_key())
+          if option_step == None:
+            print("\nSKIPPING OPTION")
+            step_option_dict.pop(step_option[0])
+            continue
+          else:
+            step_name, step_delay, step_wait, step_option = self.parse_stage(option_step)
+            step = option_step
+            step_option_dict.pop(step_option[0])
+        else:
+          continue
+
       print(("STARTING STEP '%s'" % step_name) + (" IN BACKGROUND" if not step_wait else "") + (" WITH DELAY %ss" % step_delay if step_delay > 0 else "") + "...")
 
       if step_delay > 0:
@@ -112,7 +177,7 @@ class ScriptExecutor(object):
         if handler in self.tasks:
           components = self.script[scene][step][handler].keys()
           for component in components:
-            component_name, component_delay, component_wait = self.parse_stage(component)
+            component_name, component_delay, component_wait, _ = self.parse_stage(component)
             goal = self.script[scene][step][handler][component]
 
             if component_delay > 0:
@@ -140,7 +205,6 @@ class ScriptExecutor(object):
           status = self.tasks[rid].wait(remote_id, task_id, timeout=100)
           running = running or status <= State.ACCEPTED
         time.sleep(.1)
-
 
   def confirm_scene(self, scene):
     print("\n----------------------------")
