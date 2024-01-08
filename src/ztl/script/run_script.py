@@ -166,6 +166,8 @@ class ScriptExecutor(object):
   
   def get_key(self):
     first_char = self.getch()
+    if first_char == '\x03':
+      exit(1)
     # The idea would be to allow further decomposition of the getch e.g. if arrows keys are pressed
     return first_char
 
