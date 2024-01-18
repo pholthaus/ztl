@@ -1,4 +1,4 @@
-This project contains the `ZTL` library enabling remote task execution using [ZeroMQ](https://zeromq.org/).
+This project contains the `ZTL` library enabling light-weight and widely compatible **remote task execution** using [ZeroMQ](https://zeromq.org/).
 
 The basic communication principle is as follows:
 
