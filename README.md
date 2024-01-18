@@ -1,0 +1,1 @@
+![task lifecycle](res/task%20lifecycle.png)
