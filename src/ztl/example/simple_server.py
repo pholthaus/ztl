@@ -5,7 +5,7 @@ import time
 
 from ztl.core.server import TaskServer
 from ztl.core.protocol import State
-from ztl.core.task import ExecutableTask, TaskExecutor, TaskHandler
+from ztl.core.task import ExecutableTask, TaskExecutor, TaskController
 
 
 class DummyTask(ExecutableTask):
