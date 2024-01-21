@@ -1,21 +1,30 @@
 import pytest
+import threading
 from xprocess import ProcessStarter
 
-@pytest.fixture(scope="session")
-def ztl_simple_server(xprocess):
-    class Starter(ProcessStarter):
-        # startup pattern
-        pattern = "Task Server listening"
+from ztl.core.server import TaskServer
 
-        # command to start process
+@pytest.fixture(scope="class")
+def ztl_simple_server(xprocess):
+
+    class Starter(ProcessStarter):
+        pattern = "Task Server listening"
         args = ['ztl_simple_server', "/test"]
 
-    # ensure process is running and return its logfile
     logfile = xprocess.ensure("ztl_simple_server", Starter)
 
     yield
 
-
-    # clean up whole process tree afterwards
     xprocess.getinfo("ztl_simple_server").terminate()
 
+@pytest.fixture(scope="class")
+def ztl_server():
+
+    server = TaskServer(7777)
+    server.register("/none", None)
+
+    thread = threading.Thread(target=server.listen)
+    thread.daemon = True
+    thread.start()
+
+    yield server

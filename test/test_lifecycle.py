@@ -1,44 +1,75 @@
+import pytest
+
+from unittest import TestCase
+
 from ztl.core.client import RemoteTask
+from ztl.core.server import TaskServer
 from ztl.core.protocol import State
 
-def test_reject(ztl_simple_server):
-  host = "localhost"
-  scope = "/test"
-  payload = "illegal payload"
+@pytest.mark.usefixtures("ztl_server")
+class TestLocalLife(TestCase):
 
-  task = RemoteTask("localhost", 5555, scope)
-  mid = task.trigger(payload)
+  def test_no_controller(self):
+    host = "localhost"
+    scope = "/no"
+    payload = "does not matter"
 
-  assert mid < 0
+    task = RemoteTask("localhost", 7777, scope)
+    mid = task.trigger(payload)
 
-def test_abort(ztl_simple_server):
-  host = "localhost"
-  scope = "/test"
-  payload = 5
+    assert mid < 0
 
-  task = RemoteTask("localhost", 5555, scope)
-  mid = task.trigger(payload)
+  def test_none_controller(self):
+    host = "localhost"
+    scope = "/none"
+    payload = "does not matter"
 
-  assert mid > 0
+    task = RemoteTask("localhost", 7777, scope)
+    mid = task.trigger(payload)
 
-  state = task.wait(mid, .1)
-  assert state == State.ACCEPTED
+    assert mid < 0
 
-  state = task.abort(mid)
-  assert state == State.ABORTED
+@pytest.mark.usefixtures("ztl_simple_server")
+class TestLifeCycle(TestCase):
 
-def test_completion(ztl_simple_server):
-  host = "localhost"
-  scope = "/test"
-  payload = 5
+  def test_reject(self):
+    host = "localhost"
+    scope = "/test"
+    payload = "illegal payload"
 
-  task = RemoteTask("localhost", 5555, scope)
-  mid = task.trigger(payload)
+    task = RemoteTask("localhost", 5555, scope)
+    mid = task.trigger(payload)
 
-  assert mid > 0
+    assert mid < 0
 
-  state = task.wait(mid, .1)
-  assert state == State.ACCEPTED
+  def test_abort(self):
+    host = "localhost"
+    scope = "/test"
+    payload = 5
 
-  state = task.wait(mid, 3.1)
-  assert state == State.COMPLETED
+    task = RemoteTask("localhost", 5555, scope)
+    mid = task.trigger(payload)
+
+    assert mid > 0
+
+    state = task.wait(mid, .1)
+    assert state == State.ACCEPTED
+
+    state = task.abort(mid)
+    assert state == State.ABORTED
+
+  def test_completion(self):
+    host = "localhost"
+    scope = "/test"
+    payload = 5
+
+    task = RemoteTask("localhost", 5555, scope)
+    mid = task.trigger(payload)
+
+    assert mid > 0
+
+    state = task.wait(mid, .1)
+    assert state == State.ACCEPTED
+
+    state = task.wait(mid, 3.1)
+    assert state == State.COMPLETED
