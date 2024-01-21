@@ -1,0 +1,19 @@
+image: "registry.gitlab.com/pholthaus/dev-dockerfile/dev:master"
+
+stages:
+  - test
+
+test:
+  stage: test
+  script:
+    - python3 -m venv ztl
+    - source ztl/bin/activate
+    - pip3 install -r requirements.txt
+    - pip3 install .
+    - pytest --junitxml=report.xml test/
+  artifacts:
+    when: always
+    reports:
+      junit: report.xml
+    paths:
+      - report.xml
