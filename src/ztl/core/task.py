@@ -19,7 +19,7 @@ class ExecutableTask(object):
     return True
 
 
-class TaskHandler(object):
+class TaskController(object):
 
   def init(self, payload):
     return -1, "Not implemented"
