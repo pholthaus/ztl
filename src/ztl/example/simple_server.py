@@ -28,7 +28,7 @@ class DummyTask(ExecutableTask):
     return True
 
 
-class SimpleTaskHandler(TaskHandler):
+class SimpleTaskController(TaskController):
 
   def __init__(self):
     self.current_id = 0
@@ -59,7 +59,7 @@ class SimpleTaskHandler(TaskHandler):
 def main_cli():
   scope = sys.argv[1]
   server = TaskServer(5555)
-  server.register(scope, SimpleTaskHandler())
+  server.register(scope, SimpleTaskController())
   server.listen()
 
 

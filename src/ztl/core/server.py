@@ -14,7 +14,7 @@ class TaskServer(object):
     self.socket = context.socket(zmq.REP)
     address = "tcp://*:" + str(port)
     self.socket.bind(address)
-    self.handlers = {}
+    self.controllers = {}
     self.logger.info("Task Server listening at '%s'" % address)
 
 
@@ -22,35 +22,35 @@ class TaskServer(object):
     self.socket.send(Message.encode(scope, mid, state, payload))
 
 
-  def register(self, scope, handler):
+  def register(self, scope, controller):
     """
-    Register a new handler for requests on a specific scope.
+    Register a new controller for requests on a specific scope.
 
     Parameters
     ----------
-    scope: The scope for which the server should dispatch tasks to the handler. Will replace any existing handler for this scope.
-    handler: A handler object that will be called with requests (init, status, abort)
+    scope: The scope for which the server should dispatch tasks to the controller. Will replace any existing controller for this scope.
+    controller: A controller object that will be called with requests (init, status, abort)
     """
 
-    self.logger.info("Registering handler for scope '%s'." % scope)
-    self.handlers[scope] = handler
+    self.logger.info("Registering controller for scope '%s'." % scope)
+    self.controllers[scope] = controller
 
 
   def unregister(self, scope):
     """
-    Unregister any handler on a given scope.
+    Unregister any controller on a given scope.
 
     Parameters
     ----------
     scope: The scope for which the server should not dispatch tasks any longer.
     """
-    self.handlers[scope] = None
-    self.logger.info("Handler for scope '%s' removed." % scope)
+    self.controllers[scope] = None
+    self.logger.info("Controller for scope '%s' removed." % scope)
 
 
   def listen(self):
     """
-    Begin listening to requests and dispatching them to any handlers if available. This method blocks until interrupted.
+    Begin listening to requests and dispatching them to any controllers if available. This method blocks until interrupted.
 
     """
     while True:
@@ -61,8 +61,8 @@ class TaskServer(object):
         if all(field in request for field in Message.FIELDS):
 
           scope = request["scope"]
-          if scope in self.handlers:
-            handler = self.handlers[scope]
+          if scope in self.controllers:
+            controller = self.controllers[scope]
 
             state = int(request["state"])
             mid = int(request["id"])
@@ -70,25 +70,25 @@ class TaskServer(object):
 
             try:
               if state == Request.INIT:
-                ticket, response = handler.init(payload)
+                ticket, response = controller.init(payload)
                 if ticket > 0:
                   self.send_message(scope, State.ACCEPTED, ticket, response)
                 else:
                   self.send_message(scope, State.REJECTED, ticket, response)
               elif state == Request.STATUS:
-                status, response = handler.status(mid, payload)
+                status, response = controller.status(mid, payload)
                 self.send_message(scope, status, mid, response)
               elif state == Request.ABORT:
-                status, response = handler.abort(mid, payload)
+                status, response = controller.abort(mid, payload)
                 self.send_message(scope, status, mid, response)
               else:
                 self.send_message(scope, State.REJECTED, mid, "Invalid request")
             except Exception as e:
               logging.error(e)
-              self.send_message(scope, State.FAILED, mid, "Handler threw exception: " + str(e))
+              self.send_message(scope, State.FAILED, mid, "Controller threw exception: " + str(e))
           else:
-            self.send_message(scope, State.REJECTED, -1, "No handler for scope: " + scope)
-            self.logger.warning("No handler for scope '%s', ignoring." % scope)
+            self.send_message(scope, State.REJECTED, -1, "No controller for scope: " + scope)
+            self.logger.warning("No controller for scope '%s', ignoring." % scope)
 
         else:
           self.send_message(scope, State.REJECTED, -1, "Unknown protocol")
