@@ -15,7 +15,8 @@ classifiers = [
 dependencies = [
     "oyaml",
     "pyzmq",
-    "pytest"
+    "pytest",
+    "pytest-xprocess"
 ]
 
 [project.scripts]
