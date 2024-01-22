@@ -1,0 +1,5 @@
+remotes:
+  testhandler:
+    host: "localhost"
+    port: 7779
+    scope: "/test"
