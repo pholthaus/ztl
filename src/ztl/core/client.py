@@ -14,11 +14,12 @@ class RemoteTask(object):
     self.context = zmq.Context()
     self.socket = self.context.socket(zmq.REQ)
     self.socket.setsockopt(zmq.RCVTIMEO, timeout)
-    address = "tcp://" + str(host) + ":" + str(port)
-    self.socket.connect(address)
+    self.socket.setsockopt(zmq.LINGER, 1)
+    self.address = "tcp://" + str(host) + ":" + str(port)
+    self.socket.connect(self.address)
     self.scope = scope
 
-    self.logger.info("Remote task interface initialised at '%s'.", address)
+    self.logger.info("Remote task interface initialised at '%s'.", self.address)
 
   def trigger(self, payload):
     """
