@@ -37,10 +37,10 @@ class RemoteTask(object):
     try:
       self.socket.send(msg)
       reply = Message.decode(self.socket.recv())
-      return int(reply["id"])
+      return int(reply["id"]), reply["payload"]
     except Exception as e:
       self.logger.error(e)
-      return -1
+      return -1, str(e)
 
   def abort(self, mid, payload="abort command"):
     """
@@ -59,10 +59,10 @@ class RemoteTask(object):
       msg = Message.encode(self.scope, Request.ABORT, mid, payload)
       self.socket.send(msg)
       reply = Message.decode(self.socket.recv())
-      return int(reply["state"])
+      return int(reply["state"]), reply["payload"]
     except Exception as e:
       self.logger.error(e)
-      return -1
+      return -1, str(e)
 
   def status(self, mid, payload="status update"):
     """
@@ -81,10 +81,10 @@ class RemoteTask(object):
       msg = Message.encode(self.scope, Request.STATUS, mid, payload)
       self.socket.send(msg)
       reply = Message.decode(self.socket.recv())
-      return int(reply["state"])
+      return int(reply["state"]), reply["payload"]
     except Exception as e:
       self.logger.error(e)
-      return -1
+      return -1, str(e)
 
   def wait(self, mid, payload = "waiting poll", timeout = 5.0):
     """
@@ -102,9 +102,10 @@ class RemoteTask(object):
     """
     start = time.time()
     state = -1
+    payload = None
     while (time.time() - start) < timeout and mid > 0:
-      state = self.status(mid, payload)
+      state, payload = self.status(mid, payload)
       if state > State.ACCEPTED:
-        return state
+        return state, payload
       time.sleep(.1)
-    return state
+    return state, payload
