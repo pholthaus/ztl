@@ -9,7 +9,7 @@ def ztl_simple_server(xprocess):
 
     class Starter(ProcessStarter):
         pattern = "Task Server listening"
-        args = ['ztl_simple_server', "/test"]
+        args = ['ztl_simple_server', 7777, "/test"]
 
     logfile = xprocess.ensure("ztl_simple_server", Starter)
 
@@ -20,7 +20,7 @@ def ztl_simple_server(xprocess):
 @pytest.fixture(scope="class")
 def ztl_server():
 
-    server = TaskServer(7777)
+    server = TaskServer(7778)
     server.register("/none", None)
 
     thread = threading.Thread(target=server.listen)

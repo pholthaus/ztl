@@ -57,8 +57,9 @@ class SimpleTaskController(TaskController):
 
 
 def main_cli():
-  scope = sys.argv[1]
-  server = TaskServer(5555)
+  port = sys.argv[1]
+  scope = sys.argv[2]
+  server = TaskServer(port)
   server.register(scope, SimpleTaskController())
   server.listen()
 

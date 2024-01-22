@@ -7,11 +7,12 @@ from ztl.core.protocol import State
 
 def main_cli():
   host = sys.argv[1]
-  scope = sys.argv[2]
-  payload = sys.argv[3]
+  port = sys.argv[2]
+  scope = sys.argv[3]
+  payload = sys.argv[4]
 
-  print("Connecting to host '%s' at scope '%s'..." % (host, scope))
-  task = RemoteTask(str(host), 5555, scope)
+  print("Connecting to host '%s:%s' at scope '%s'..." % (host, port, scope))
+  task = RemoteTask(host, port, scope)
   print("Triggering task with payload '%s'..." % payload)
   mid = task.trigger(payload)
 

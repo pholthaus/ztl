@@ -11,20 +11,22 @@ class TestLocalLife(TestCase):
 
   def test_no_controller(self):
     host = "localhost"
+    port = 7778
     scope = "/no"
     payload = "does not matter"
 
-    task = RemoteTask("localhost", 7777, scope)
+    task = RemoteTask(host, port, scope)
     mid = task.trigger(payload)
 
     assert mid < 0
 
   def test_none_controller(self):
     host = "localhost"
+    port = 7778
     scope = "/none"
     payload = "does not matter"
 
-    task = RemoteTask("localhost", 7777, scope)
+    task = RemoteTask(host, port, scope)
     mid = task.trigger(payload)
 
     assert mid < 0
@@ -35,9 +37,10 @@ class TestLifeCycle(TestCase):
   def test_reject(self):
     host = "localhost"
     scope = "/test"
+    port = 7777
     payload = "illegal payload"
 
-    task = RemoteTask("localhost", 5555, scope)
+    task = RemoteTask(host, port, scope)
     mid = task.trigger(payload)
 
     assert mid < 0
@@ -45,9 +48,10 @@ class TestLifeCycle(TestCase):
   def test_abort(self):
     host = "localhost"
     scope = "/test"
+    port = 7777
     payload = 5
 
-    task = RemoteTask("localhost", 5555, scope)
+    task = RemoteTask(host, port, scope)
     mid = task.trigger(payload)
 
     assert mid > 0
@@ -60,10 +64,11 @@ class TestLifeCycle(TestCase):
 
   def test_completion(self):
     host = "localhost"
+    port = 7777
     scope = "/test"
     payload = 5
 
-    task = RemoteTask("localhost", 5555, scope)
+    task = RemoteTask(host, port, scope)
     mid = task.trigger(payload)
 
     assert mid > 0

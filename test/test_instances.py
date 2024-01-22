@@ -8,8 +8,8 @@ from ztl.core.server import TaskServer
 class TestConstruction(TestCase):
 
   def test_server_construction(self):
-    server = TaskServer(6666)
+    server = TaskServer(7779)
     server.register("/dummy", None)
 
   def test_client_construction(self):
-    RemoteTask("localhost", 6666, "/dummy")
+    RemoteTask("localhost", 7779, "/dummy")
