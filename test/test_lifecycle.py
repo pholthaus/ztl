@@ -16,7 +16,7 @@ class TestLocalLife(TestCase):
     payload = "does not matter"
 
     task = RemoteTask(host, port, scope)
-    mid = task.trigger(payload)
+    mid, reply = task.trigger(payload)
 
     assert mid < 0
 
@@ -27,7 +27,7 @@ class TestLocalLife(TestCase):
     payload = "does not matter"
 
     task = RemoteTask(host, port, scope)
-    mid = task.trigger(payload)
+    mid, reply = task.trigger(payload)
 
     assert mid < 0
 
@@ -41,7 +41,7 @@ class TestLifeCycle(TestCase):
     payload = "illegal payload"
 
     task = RemoteTask(host, port, scope)
-    mid = task.trigger(payload)
+    mid, reply = task.trigger(payload)
 
     assert mid < 0
 
@@ -52,14 +52,14 @@ class TestLifeCycle(TestCase):
     payload = 5
 
     task = RemoteTask(host, port, scope)
-    mid = task.trigger(payload)
+    mid, reply = task.trigger(payload)
 
     assert mid > 0
 
-    state = task.wait(mid, .1)
+    state, reply = task.wait(mid, .1)
     assert state == State.ACCEPTED
 
-    state = task.abort(mid)
+    state, reply = task.abort(mid)
     assert state == State.ABORTED
 
   def test_completion(self):
@@ -69,12 +69,12 @@ class TestLifeCycle(TestCase):
     payload = 5
 
     task = RemoteTask(host, port, scope)
-    mid = task.trigger(payload)
+    mid, reply = task.trigger(payload)
 
     assert mid > 0
 
-    state = task.wait(mid, .1)
+    state, reply = task.wait(mid, .1)
     assert state == State.ACCEPTED
 
-    state = task.wait(mid, 3.1)
+    state, reply = task.wait(mid, 3.1)
     assert state == State.COMPLETED

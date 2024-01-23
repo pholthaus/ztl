@@ -32,6 +32,7 @@ class RemoteTask(object):
     Returns
     -------
     id: An ID for the task assigned by the server if accepted, -1 if rejected or server not reachable or communication error.
+    reply: The remote reply containing an updated task description or the error message if rejected or server not reachable or communication error.
     """
     msg = Message.encode(self.scope, Request.INIT, -1, payload)
     try:
@@ -54,6 +55,7 @@ class RemoteTask(object):
     Returns
     -------
     status: The updated status after attempting to abort. Task might not be aborted. -1 if server not reachable or communication error.
+    reply: The remote reply containing an updated task description. May contain error message if task not aborted or server not reachable or communication error.
     """
     try:
       msg = Message.encode(self.scope, Request.ABORT, mid, payload)
@@ -76,6 +78,7 @@ class RemoteTask(object):
     Returns
     -------
     id: The current status of the task at the server. -1 if server not reachable or communication error.
+    reply: The remote reply containing an updated task description or the error message if server not reachable or communication error.
     """
     try:
       msg = Message.encode(self.scope, Request.STATUS, mid, payload)
@@ -99,6 +102,7 @@ class RemoteTask(object):
     Returns
     -------
     id: The last task status after waiting complete. -1 if server not reachable or communication error.
+    reply: The remote reply containing an updated task description or the error message if server not reachable or communication error.
     """
     start = time.time()
     state = -1
