@@ -10,12 +10,12 @@ from ztl.core.task import ExecutableTask, TaskExecutor, TaskController
 
 class PrintTask(ExecutableTask):
 
-  def __init__(self, payload):
+  def __init__(self, request):
     self.active = True
-    self.payload = payload
+    self.request = request
 
   def initialise(self):
-    self.description = Task.decode(self.payload)
+    self.description = Task.decode(self.request)
     return True
 
   def execute(self):
@@ -25,7 +25,7 @@ class PrintTask(ExecutableTask):
     return True
 
   def abort(self):
-    return False
+    return False, "Not running"
 
 
 class TaskTaskController(TaskController):
@@ -34,23 +34,23 @@ class TaskTaskController(TaskController):
     self.current_id = 0
     self.running = {}
 
-  def init(self, payload):
+  def init(self, request):
     self.current_id += 1
-    print("Initialising Task ID '%s' (%s)..." % (self.current_id, payload))
-    self.running[self.current_id] = TaskExecutor(PrintTask, payload)
-    return self.current_id, payload
+    print("Initialising Task ID '%s' (%s)..." % (self.current_id, request))
+    self.running[self.current_id] = TaskExecutor(PrintTask, request)
+    return self.current_id, "Initiated task '%s' with request: %s" % (self.current_id, request)
 
-  def status(self, mid, payload):
+  def status(self, mid, request):
     if mid in self.running:
-      print("Status Task ID '%s' (%s)..." % (mid, payload))
-      return self.running[mid].state(), payload
+      print("Status Task ID '%s' (%s)..." % (mid, request))
+      return self.running[mid].state(), State.name(self.running[mid].state())
     else:
       return State.REJECTED, "Invalid ID"
 
 
-  def abort(self, mid, payload):
+  def abort(self, mid, request):
     if mid in self.running:
-      print("Aborting Task ID '%s' (%s)..." % (mid, payload))
+      print("Aborting Task ID '%s' (%s)..." % (mid, request))
       return self.running[mid].stop()
     else:
       return State.REJECTED, "Invalid ID"

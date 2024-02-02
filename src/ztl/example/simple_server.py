@@ -34,24 +34,24 @@ class SimpleTaskController(TaskController):
     self.current_id = 0
     self.running = {}
 
-  def init(self, payload):
+  def init(self, request):
     self.current_id += 1
-    print("Initialising Task ID '%s' (%s)..." % (self.current_id, payload))
-    self.running[self.current_id] = TaskExecutor(DummyTask, int(payload))
-    return self.current_id, ""
+    print("Initialising Task ID '%s' (%s)..." % (self.current_id, request))
+    self.running[self.current_id] = TaskExecutor(DummyTask, int(request))
+    return self.current_id, "Initiated task '%s' to be active for %s seconds" % (self.current_id, int(request))
 
-  def status(self, mid, payload):
+  def status(self, mid, request):
     if mid in self.running:
-      print("Status Task ID '%s' (%s)..." % (mid, payload))
-      return self.running[mid].state(), mid 
+      print("Status Task ID '%s' (%s)..." % (mid, request))
+      return self.running[mid].state(), State.name(self.running[mid].state())
     else:
       return State.REJECTED, "Invalid ID"
 
 
-  def abort(self, mid, payload):
+  def abort(self, mid, request):
     if mid in self.running:
-      print("Aborting Task ID '%s' (%s)..." % (mid, payload))
-      return self.running[mid].stop(), mid
+      print("Aborting Task ID '%s' (%s)..." % (mid, request))
+      return self.running[mid].stop(), State.name(self.running[mid].state())
     else:
       return State.REJECTED, "Invalid ID"
 
