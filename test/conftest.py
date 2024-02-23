@@ -28,3 +28,22 @@ def ztl_server():
     thread.start()
 
     yield server
+
+@pytest.fixture(scope="class")
+def ztl_data(request):
+
+    msg = {
+        "scope": "scope",
+        "state": "state",
+        "id": "id",
+        "payload": "payload"
+    }
+
+    task = {
+        "handler": "handler",
+        "component": "component",
+        "goal": "goal"
+    }
+
+    request.cls.msg = msg
+    request.cls.task = task
