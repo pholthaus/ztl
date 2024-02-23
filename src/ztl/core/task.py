@@ -7,16 +7,11 @@ from ztl.core.protocol import State
 
 class ExecutableTask(object):
 
-  def initialise(self):
-    return True
-
-
   def execute(self):
-    return True
-
+    pass
 
   def abort(self):
-    return True
+    return False
 
 
 class TaskController(object):
