@@ -82,7 +82,6 @@ class TaskExecutor(Thread):
         self._state = State.ABORTED
       else:
         self.logger.debug("Task could not be aborted.")
-    return self._state
 
 
   def abort(self):

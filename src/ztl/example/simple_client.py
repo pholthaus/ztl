@@ -34,7 +34,7 @@ def main_cli():
     else:
       print("Task with ID '%s' finished while waiting. Reply is '%s'." % (mid, reply))
   else:
-    print("Task '%s' could not be triggered.")
+    print("Task '%s' could not be triggered: '%s'." % reply)
 
 if __name__ == "__main__":
 

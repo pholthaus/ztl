@@ -51,7 +51,8 @@ class TaskTaskController(TaskController):
   def abort(self, mid, request):
     if mid in self.running:
       print("Aborting Task ID '%s' (%s)..." % (mid, request))
-      return self.running[mid].stop()
+      self.running[mid].stop()
+      return self.running[mid].state(), State.name(self.running[mid].state())
     else:
       return State.REJECTED, "Invalid ID"
 
