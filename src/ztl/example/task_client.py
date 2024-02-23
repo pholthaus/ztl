@@ -31,10 +31,10 @@ def main_cli():
         print("Task with ID '%s' aborted. Reply is '%s'." % (mid, reply))
       elif state <= State.ACCEPTED:
         print("Could not abort Task with ID '%s', waiting for completion. Reply is '%s'." % (mid, reply))
-        task.wait(mid)
+        state, reply = task.wait(mid)
         print("Task with ID '%s' finished after unsuccessful abort signal. Reply is '%s'." % (mid, reply))
     else:
-      print("Task with ID '%s' finished while waiting. Reply is '%s'." % (mid, reply))
+      print("Task with ID '%s' finished while waiting. Result is '%s'." % (mid, reply))
 
   else:
     print("Task '%s' could not be triggered: '%s'." % (mid, reply))

@@ -13,19 +13,17 @@ class PrintTask(ExecutableTask):
   def __init__(self, request):
     self.active = True
     self.request = request
-
-  def initialise(self):
     self.description = Task.decode(self.request)
-    return True
 
   def execute(self):
     print("handler: " + self.description["handler"])
     print("component: " + self.description["component"])
     print("goal: " + self.description["goal"])
-    return True
+    time.sleep(3)
+    return "finished"
 
   def abort(self):
-    return False, "Not running"
+    return False
 
 
 class TaskTaskController(TaskController):
@@ -43,19 +41,22 @@ class TaskTaskController(TaskController):
   def status(self, mid, request):
     if mid in self.running:
       print("Status Task ID '%s' (%s)..." % (mid, request))
-      return self.running[mid].state(), State.name(self.running[mid].state())
+      state = self.running[mid].state()
+      if state < State.COMPLETED:
+        return state, State.name(state)
+      else:
+        return state, self.running[mid].result()
     else:
       return State.REJECTED, "Invalid ID"
-
 
   def abort(self, mid, request):
     if mid in self.running:
       print("Aborting Task ID '%s' (%s)..." % (mid, request))
-      self.running[mid].stop()
-      return self.running[mid].state(), State.name(self.running[mid].state())
+      success = self.running[mid].stop()
+      state = self.running[mid].state()
+      return state, success
     else:
       return State.REJECTED, "Invalid ID"
-
 
 def main_cli():
   port = sys.argv[1]

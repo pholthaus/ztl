@@ -14,9 +14,6 @@ class DummyTask(ExecutableTask):
     self.active = True
     self.duration = duration
 
-  def initialise(self):
-    return True
-
   def execute(self):
     start = time.time()
     while self.active and time.time() - start < self.duration:
@@ -43,18 +40,22 @@ class SimpleTaskController(TaskController):
   def status(self, mid, request):
     if mid in self.running:
       print("Status Task ID '%s' (%s)..." % (mid, request))
-      return self.running[mid].state(), State.name(self.running[mid].state())
+      state = self.running[mid].state()
+      if state < State.COMPLETED:
+        return state, State.name(state)
+      else:
+        return state, self.running[mid].result()
     else:
       return State.REJECTED, "Invalid ID"
-
 
   def abort(self, mid, request):
     if mid in self.running:
       print("Aborting Task ID '%s' (%s)..." % (mid, request))
-      return self.running[mid].stop(), State.name(self.running[mid].state())
+      success = self.running[mid].stop()
+      state = self.running[mid].state()
+      return state, success
     else:
       return State.REJECTED, "Invalid ID"
-
 
 def main_cli():
   port = sys.argv[1]

@@ -32,7 +32,7 @@ def main_cli():
         task.wait(mid)
         print("Task with ID '%s' finished after unsuccessful abort signal. Reply is '%s'." % (mid, reply))
     else:
-      print("Task with ID '%s' finished while waiting. Reply is '%s'." % (mid, reply))
+      print("Task with ID '%s' finished while waiting. Result is '%s'." % (mid, reply))
   else:
     print("Task '%s' could not be triggered: '%s'." % reply)
 
