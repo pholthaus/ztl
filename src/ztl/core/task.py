@@ -44,8 +44,9 @@ class TaskExecutor(Thread):
       self.task = self.cls(*self.parameters)
       self.start()
     except Exception as e:
-      self.logger.debug("Task initialising failed, rejecting task.")
+      self.logger.debug("Task initialising failed, rejecting task: '%s'", e)
       self._state = State.REJECTED
+      self._result = e
 
   def run(self):
     if not self._prevent:
@@ -56,8 +57,10 @@ class TaskExecutor(Thread):
         self.logger.debug("Task execution completed successfully.")
         self._state = State.COMPLETED
       except Exception as e:
-        self.logger.debug("Task execution failed.")
+        self.logger.debug("Task execution failed: '%s'", e)
         self._state = State.FAILED
+        self._result = e
+
     else:
       self._state = State.ABORTED
       logging.warn("Task execution prevented during initialising.")
