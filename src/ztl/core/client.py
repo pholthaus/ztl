@@ -97,11 +97,11 @@ class RemoteTask(object):
     ----------
     mid: The ID of the task to wait for.
     payload: An optional payload containing an updated task description. Default: "waiting poll"
-    timeout: Maximum time to wait. Default: 5.0 secs.
+    timeout: Maximum time to wait, interpreted as infinite when equal or smaller than 0. Default: 5.0 secs.
 
     Returns
     -------
-    id: The last task status after waiting complete. -1 if server not reachable or communication error.
+    state: The last task status after waiting complete. -1 if server not reachable or communication error.
     reply: The remote reply containing an updated task description or the error message if server not reachable or communication error.
     """
     start = time.time()
