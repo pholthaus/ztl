@@ -107,7 +107,7 @@ class RemoteTask(object):
     start = time.time()
     state = -1
     reply = None
-    while (time.time() - start) < timeout and mid > 0:
+    while timeout <= 0 or (time.time() - start) < timeout:
       state, reply = self.status(mid, payload = payload)
       if state > State.ACCEPTED:
         return state, reply

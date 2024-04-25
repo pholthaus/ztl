@@ -10,6 +10,10 @@ def main_cli():
   port = sys.argv[2]
   scope = sys.argv[3]
   cmd = sys.argv[4].split(":")
+  if len(sys.argv) > 5:
+    timeout = int(sys.argv[5])
+  else:
+    timeout = 5
 
   print("Connecting to host '%s:%s' at scope '%s'..." % (host, port, scope))
   task = RemoteTask(host, port, scope)
@@ -19,9 +23,8 @@ def main_cli():
   mid, reply = task.trigger(request)
 
   if mid > 0:
-    print("Initialised task with ID '%s'. Reply is '%s'." % (mid, reply))
-
-    state, reply = task.wait(mid, 5)
+    print("Initialised task with ID '%s' for %ss. Reply is '%s'." % (mid, timeout, reply))
+    state, reply = task.wait(mid, timeout=timeout)
     if state < 0:
       print("Could not wait for task with ID '%s'. Reply is '%s'." % (mid, reply))
     elif state <= State.ACCEPTED:
