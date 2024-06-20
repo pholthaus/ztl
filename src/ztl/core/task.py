@@ -7,16 +7,11 @@ from ztl.core.protocol import State
 
 class ExecutableTask(object):
 
-  def initialise(self):
-    return True
-
-
   def execute(self):
-    return True
-
+    pass
 
   def abort(self):
-    return True
+    return False
 
 
 class TaskController(object):
@@ -42,32 +37,33 @@ class TaskExecutor(Thread):
     self.parameters = parameters
     self.task = None
     self._state = State.INITIATED
+    self._result = None
     self._prevent = False
-    self.start()
-
+    try:
+      self.logger.debug("Initiating task with parameters '%s'...", self.parameters)
+      self.task = self.cls(*self.parameters)
+      self.start()
+    except Exception as e:
+      self.logger.debug("Task initialising failed, rejecting task: '%s'", e)
+      self._state = State.REJECTED
+      self._result = e
 
   def run(self):
-    self.logger.debug("Initiating task with parameters '%s'...", self.parameters)
-    self.task = self.cls(*self.parameters)
-    success = self.task.initialise()
-    if success:
-      if not self._prevent:
-        self.logger.debug("Accepting and executing task...")
-        self._state = State.ACCEPTED
-        success = self.task.execute()
-        if success:
-          self.logger.debug("Task execution completed successfully.")
-          self._state = State.COMPLETED
-        else:
-          self.logger.debug("Task execution failed.")
-          self._state = State.FAILED
-      else:
+    if not self._prevent:
+      self.logger.debug("Accepting and executing task...")
+      self._state = State.ACCEPTED
+      try:
+        self._result = self.task.execute()
+        self.logger.debug("Task execution completed successfully.")
+        self._state = State.COMPLETED
+      except Exception as e:
+        self.logger.debug("Task execution failed: '%s'", e)
         self._state = State.FAILED
-        logging.warn("Task execution prevented during initialising.")
-    else:
-      self.logger.debug("Task initialising failed, rejecting task.")
-      self._state = State.REJECTED
+        self._result = e
 
+    else:
+      self._state = State.ABORTED
+      logging.warn("Task execution prevented during initialising.")
 
   def stop(self):
     if self.task is None:
@@ -82,7 +78,7 @@ class TaskExecutor(Thread):
         self._state = State.ABORTED
       else:
         self.logger.debug("Task could not be aborted.")
-    return self._state
+      return success
 
 
   def abort(self):
@@ -93,3 +89,6 @@ class TaskExecutor(Thread):
 
   def state(self):
     return self._state
+
+  def result(self):
+    return self._result

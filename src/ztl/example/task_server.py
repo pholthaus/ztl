@@ -4,28 +4,29 @@ import sys
 import time
 
 from ztl.core.server import TaskServer
-from ztl.core.protocol import State
+from ztl.core.protocol import State, Task
 from ztl.core.task import ExecutableTask, TaskExecutor, TaskController
 
 
-class DummyTask(ExecutableTask):
+class PrintTask(ExecutableTask):
 
-  def __init__(self, duration):
+  def __init__(self, request):
     self.active = True
-    self.duration = duration
+    self.request = request
+    self.description = Task.decode(self.request)
 
   def execute(self):
-    start = time.time()
-    while self.active and time.time() - start < self.duration:
-      time.sleep(.1)
-    return self.active
+    print("handler: " + self.description["handler"])
+    print("component: " + self.description["component"])
+    print("goal: " + self.description["goal"])
+    time.sleep(3)
+    return "finished"
 
   def abort(self):
-    self.active = False
-    return True
+    return False
 
 
-class SimpleTaskController(TaskController):
+class TaskTaskController(TaskController):
 
   def __init__(self):
     self.current_id = 0
@@ -34,8 +35,8 @@ class SimpleTaskController(TaskController):
   def init(self, request):
     self.current_id += 1
     print("Initialising Task ID '%s' (%s)..." % (self.current_id, request))
-    self.running[self.current_id] = TaskExecutor(DummyTask, int(request))
-    return self.current_id, "Initiated task '%s' to be active for %s seconds" % (self.current_id, int(request))
+    self.running[self.current_id] = TaskExecutor(PrintTask, request)
+    return self.current_id, "Initiated task '%s' with request: %s" % (self.current_id, request)
 
   def status(self, mid, request):
     if mid in self.running:
@@ -61,7 +62,7 @@ def main_cli():
   port = sys.argv[1]
   scope = sys.argv[2]
   server = TaskServer(port)
-  server.register(scope, SimpleTaskController())
+  server.register(scope, TaskTaskController())
   server.listen()
 
 
