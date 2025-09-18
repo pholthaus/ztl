@@ -47,19 +47,19 @@ class Message:
 
   @staticmethod
   def decode(message):
-    split = message.decode("utf-8").split(Message.SEPARATOR)
+    split = message.decode("utf-8").split(Message.SEPARATOR, len(Message.FIELDS) - 1)
     unfolded = dict(zip(Message.FIELDS, split))
     return unfolded
 
 
 class Task:
 
-  SEPARATOR = "^"
+  SEPARATOR = "¬"
   FIELDS = ["handler", "component", "goal"]
 
   @staticmethod
   def decode(message):
-    cmd = base64.b64decode(bytes(str(message).encode("utf-8"))).decode("utf-8").split(Task.SEPARATOR)
+    cmd = base64.b64decode(bytes(str(message).encode("utf-8"))).decode("utf-8").split(Task.SEPARATOR, len(Task.FIELDS) - 1)
     return dict(zip(Task.FIELDS, cmd))
 
   @staticmethod

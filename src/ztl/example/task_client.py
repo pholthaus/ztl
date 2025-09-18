@@ -9,7 +9,7 @@ def main_cli():
   host = sys.argv[1]
   port = sys.argv[2]
   scope = sys.argv[3]
-  cmd = sys.argv[4].split(":")
+  cmd = sys.argv[4].split(":", 2)
   if len(sys.argv) > 5:
     timeout = int(sys.argv[5])
   else:
@@ -19,6 +19,7 @@ def main_cli():
   task = RemoteTask(host, port, scope)
 
   request = Task.encode(cmd[0], cmd[1], cmd[2])
+  
   print("Triggering task with request '%s'..." % request)
   mid, reply = task.trigger(request)
 
