@@ -54,7 +54,7 @@ class Message:
 
 class Task:
 
-  SEPARATOR = "¬"
+  SEPARATOR = ":"
   FIELDS = ["handler", "component", "goal"]
 
   @staticmethod
