@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name='ztl',
-      version='0.0.4',
+      version='0.0.5',
       description='A thin library relying on zmq to dispatch tasks',
       author='Patrick Holthaus',
       author_email='patrick.holthaus@googlemail.com',
