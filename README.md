@@ -24,27 +24,23 @@ Package installation on other operating systems might vary, but you should make 
 For modern Ubuntu-based systems using Python 3, the first step is to create and activate a virtual environment:
 
 ```bash
- apt install python3-pip python3-venv
- python3 -m venv ~/ztl
+> apt install python3-pip python3-venv
+> python3 -m venv ~/ztl
 ```
 
 For older Ubuntu systems using Python version 2, please use the following steps instead:
 
 ```bash
- apt install python-pip python-virtualenv
- virtualenv ~/ztl
+> apt install python-pip python-virtualenv
+> virtualenv ~/ztl
 ```
 
 No matter which python version, next you need to load this environment.
 You have to repeat this step for every terminal you want to use the library in:
 
 ```bash
- source ~/ztl/bin/activate
+> source ~/ztl/bin/activate
 ```
-
-### Windows powershell
-
-.\Scripts\Activate.ps1
 
 ## Installing the library
 
@@ -55,7 +51,7 @@ There are multiple possibilities to install the library on your system. All are 
 On modern systems with Python 3, you can simply use pip for installation. Add the option `--upgrade` to update to the latest version.
 
 ```bash
- pip install ztl
+> pip install ztl
 ```
 
 ### Option 2 (zip file)
@@ -63,8 +59,8 @@ On modern systems with Python 3, you can simply use pip for installation. Add th
 Alternatively, you can download and unpack the source code, independent of your Python version. Please check the `.zip` file for any subfolders containing the actual files (e.g. when you download from the gitlab repository, it will create a subfolder called `ztl-main`).
 
 ```bash
- unzip /path/to/ztl.zip -d ~/ztl-src
- pip install ~/ztl-src
+> unzip /path/to/ztl.zip -d ~/ztl-src
+> pip install ~/ztl-src
 ```
 
 ### Option 3 (repository)
@@ -72,16 +68,18 @@ Alternatively, you can download and unpack the source code, independent of your 
 You can also clone the repository directly and install the latest sources, independent of your Python version. If you replace `main` with a branch or tag, you can install specific versions.
 
 ```bash
- pip install git+https://gitlab.com/robothouse/rh-user/ztl@main
+> pip install git+https://gitlab.com/robothouse/rh-user/ztl@main
 ```
 
 # Demo:
 
-To test the correct installation of ZTL, you can use the following steps. Please remember to activate the virtual environment for each terminal:
+To test the correct installation of ZTL, you can use the following steps. Please remember to activate the virtual environment for each terminal.
 
 ```bash
- source ~/ztl/bin/activate
+> source ~/ztl/bin/activate
 ```
+
+## Simple client-server communication
 
 First, spawn a server listening on port 12345 and the scope `/test`:
 
@@ -118,6 +116,39 @@ Status Task ID '1' (waiting poll): ACCEPTED.
 Status Task ID '1' (waiting poll): COMPLETED.
 ```
 We find that the client first initialises a task (with the specification of handler, component, and goal) and then polls the server periodically about the status of the task it has provided.
+
+## Scripting example
+
+To test the scripting interface, you can use the configurations provided in the [example](src/ztl/example/) folder (Note: these are not installed using `pip` but are part of the source code package). First, we need to start a task server, for which one of the example servers is sufficient as it provides all the necessary communication with the scripting engine. Please remember to activate the virtual environment for each terminal.
+
+```bash
+> ztl_task_server -p 7779 -s /test
+```
+
+Next, download the configuration files if you do not have them yet.
+
+```bash
+> git clone https://gitlab.com/robothouse/rh-user/ztl ~/ztl-src
+```
+
+Run the sample scripts:
+
+```bash
+> cd ~/ztl-src/src/ztl/example/
+> ztl_run_script -s sample_script_short.yaml -c sample_conf.yaml
+INFO:script-exec:Initialising remote task interface 'testhandler'...
+INFO:remote-task:Remote task interface initialised at 'tcp://localhost:7779'.
+
+----------------------------
+ABOUT TO EXECUTE SCENE 'scene'
+STEP: first step
+        testhandler [print]: -> test me
+STEP: second step
+        testhandler [print]: -> another test
+PRESS <ENTER> TO CONFIRM or ANY OTHER KEY TO SKIP
+```
+
+You can now trigger the example scene by pressing `ENTER`, which will execute a single scene consisting of two steps in sequence, both calling the `testhandler` we started above. You can also skip the scene to finish the script immediately. Again, the server will output the triggering, acceptance, and completion of both calls. You can modify the script to call multiple handlers in each step but you have to configure them in the file `sample_conf.yaml` and start another `ztl_task_server` to match this configuration.
 
 # Instructions for use:
 
