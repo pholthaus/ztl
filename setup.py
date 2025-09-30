@@ -24,5 +24,11 @@ setup(name='ztl',
                   'ztl_task_client=ztl.example.task_client:main_cli',
                   'ztl_run_script=ztl.script.run_script:main_cli'
             ]
-      }
+      },
+      install_requires=[
+            'oyaml',
+            'pyzmq',
+            'pytest',
+            'pytest-xprocess'
+      ]
 )
