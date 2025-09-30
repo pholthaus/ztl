@@ -2,7 +2,7 @@
 name = "ztl"
 version = "0.0.6"
 authors = [
-  { name="XXXX-6 XXXX-2", email="XXXX-6.XXXX-2@googlemail.com" },
+  { name="Patrick Holthaus", email="patrick.holthaus@googlemail.com" },
 ]
 description = "A thin library relying on zmq to dispatch tasks"
 readme = "README.md"
@@ -28,5 +28,5 @@ ztl_task_client = "ztl.example.task_client:main_cli"
 ztl_run_script = "ztl.script.run_script:main_cli"
 
 [project.urls]
-"Homepage" = "XXXX-7"
-"Bug Tracker" = "XXXX-7"
+"Homepage" = "https://gitlab.com/robothouse/rh-user/ztl/"
+"Bug Tracker" = "https://gitlab.com/robothouse/rh-user/ztl/issues/"
