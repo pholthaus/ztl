@@ -11,18 +11,18 @@ This project contains the `ZTL` library enabling light-weight and widely compati
    * pytest, pytest-xprocess (for testing only)
 
 
-# Quick usage (modern Ubuntu):
+# Quick usage (modern Ubuntu)
 
 If you're running a modern Ubuntu using Python 3, follow these simple steps for installing ZTL in a virtual environment. You can then skip the detailled Installation Guide and try the Demo directly.
 
 ```bash
-> apt install python3-pip python3-venv
+> sudo apt install python3-pip python3-venv
 > python3 -m venv ~/ztl
 > source ~/ztl/bin/activate
 > pip install ztl
 ```
 
-# Detailled Installation guide:
+# Detailled installation guide
 
 You can easily install and use ZTL in a Python virtual environment in a two-step process. First, we need to setup the virtual environment and then install the library depending on your preferences. The process described covers various Ubuntu versions but the library can also be installed and used in Windows using  using slightly different commands.
 
@@ -30,19 +30,19 @@ You can easily install and use ZTL in a Python virtual environment in a two-step
 
 To create such an environment in your home directory, follow the below steps.
 You can install into any existing virtual environment or change the installation folder from ~/ztl to any other folder you prefer.
-Package installation on other operating systems might vary, but you should make sure to have `pip` and `venv` modules for python ready.
 
-For modern Ubuntu-based systems using Python 3, the first step is to create and activate a virtual environment:
+For modern Ubuntu-based systems using Python 3, the first step is to install the necessary packages and then to create and activate a virtual environment.
+Package installation will need administrator rights and might fail. Installation on other operating systems might also vary, but you should make sure to have `pip` and `venv` modules for python ready. 
 
 ```bash
-> apt install python3-pip python3-venv
+> sudo apt install python3-pip python3-venv
 > python3 -m venv ~/ztl
 ```
 
 For older Ubuntu systems using Python version 2, please use the following steps instead:
 
 ```bash
-> apt install python-pip python-virtualenv
+> sudo apt install python-pip python-virtualenv
 > virtualenv ~/ztl
 ```
 
@@ -82,7 +82,7 @@ You can also clone the repository directly and install the latest sources, indep
 > pip install git+https://gitlab.com/robothouse/rh-user/ztl@main
 ```
 
-# Demo:
+# Demo
 
 To test the correct installation of ZTL, you can use the following steps. Please remember to activate the virtual environment for each terminal.
 
@@ -161,7 +161,7 @@ PRESS <ENTER> TO CONFIRM or ANY OTHER KEY TO SKIP
 
 You can now trigger the example scene by pressing `ENTER`, which will execute a single scene consisting of two steps in sequence, both calling the `testhandler` we started above. You can also skip the scene to finish the script immediately. Again, the server will output the triggering, acceptance, and completion of both calls. You can modify the script to call multiple handlers in each step but you have to configure them in the file `sample_conf.yaml` and start another `ztl_task_server` to match this configuration.
 
-# Instructions for use:
+# Instructions for use
 
 To implement your own server in Python, you can use the following as an example. This code, however, will reject any task and never execute the `status()` or `abort()` functions since the task is never initialised correctly. For a slightly longer working example including an executable task, refer to [task_server.py](src/ztl/example/task_server.py) in the examples.
 
