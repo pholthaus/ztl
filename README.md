@@ -13,7 +13,7 @@ This project contains the `ZTL` library enabling light-weight and widely compati
 
 # Quick usage (modern Ubuntu)
 
-If you're running a modern Ubuntu using Python 3, follow these simple steps for installing ZTL in a virtual environment. You can then skip the detailled Installation Guide and try the Demo directly.
+If you know what you are doing and operate a modern Ubuntu using Python 3, follow these simple steps for installing ZTL in a virtual environment. You can then skip the detailled Installation Guide and try the Demo directly.
 
 ```bash
 > sudo apt install python3-pip python3-venv
