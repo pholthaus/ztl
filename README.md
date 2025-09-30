@@ -13,35 +13,73 @@ This project contains the `ZTL` library enabling light-weight and widely compati
 
 # Installation guide:
 
-You can easily install ZTL in a Python virtual environment.
-To create such an environment in your home directory on a modern Ubuntu (using Python version 3), follow the below steps.
+You can easily install and use ZTL in a Python virtual environment in a two-step process. First, we need to setup the virtual environment and then install the library depending on your preferences.
+
+
+## Preparing the virtual environment
+
+To create such an environment in your home directory, follow the below steps.
 You can install into any existing virtual environment or change the installation folder from ~/ztl to any other folder you prefer.
+Package installation on other operating systems might vary, but you should make sure to have `pip` and `venv` modules for python ready.
+For modern Ubuntu-based systems using Python 3, the first step is to create and activate a virtual environment:
 
 ```bash
  apt install python3-pip python3-venv
  python3 -m venv ~/ztl
- source ~/ztl/bin/activate
- pip3 install ztl
 ```
 
-For older operating systems using Python version 2, please use the following process:
+For older Ubuntu systems using Python version 2, please use the following steps instead:
 
 ```bash
  apt install python-pip python-virtualenv
  virtualenv ~/ztl
- source ~/ztl/bin/activate
- pip install git+https://gitlab.com/robothouse/rh-user/ztl
 ```
 
-You can also clone this repository and use the sources directly:
+
+
+No matter which python version, next you need to load this environment.
+You have to repeat this step for every terminal you want to use the library in:
 
 ```bash
-git clone https://gitlab.com/robothouse/rh-user/ztl ~/ztl-src
+ source ~/ztl/bin/activate
+```
+
+## Installing the library
+
+There are multiple possibilities to install the library on your system. All are valid alternatives, however, some are restricted to specific Python versions.
+
+### Option 1 (pip)
+
+On modern systems with Python 3, you can simply use pip for installation. Add the option `--upgrade` to update to the latest version.
+
+```bash
+ pip install ztl
+```
+
+### Option 2 (zip file)
+
+Alternatively, you can download and unpack the source code, independent of your Python version. Please check the `.zip` file for any subfolders containing the actual files (e.g. when you download from the gitlab repository, it will create a subfolder called `ztl-main`).
+
+```bash
+ unzip /path/to/ztl.zip -d ~/ztl-src
+ pip install ~/ztl-src
+```
+
+### Option 3 (repository)
+
+You can also clone the repository directly and install the latest sources, independent of your Python version. If you replace `main` with a branch or tag, you can install specific versions.
+
+```bash
+ pip install git+https://gitlab.com/robothouse/rh-user/ztl@main
 ```
 
 # Demo:
 
-To test the correct installation of ZTL, you can use the following steps.
+To test the correct installation of ZTL, you can use the following steps. Please remember to activate the virtual environment for each terminal:
+
+```bash
+ source ~/ztl/bin/activate
+```
 
 First, spawn a server listening on port 12345 and the scope `/test`:
 
