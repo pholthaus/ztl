@@ -11,7 +11,18 @@ This project contains the `ZTL` library enabling light-weight and widely compati
    * pytest, pytest-xprocess (for testing only)
 
 
-# Installation guide:
+# Quick usage (modern Ubuntu):
+
+If you're running a modern Ubuntu using Python 3, follow these simple steps for installing ZTL in a virtual environment. You can then skip the detailled Installation Guide and try the Demo directly.
+
+```bash
+> apt install python3-pip python3-venv
+> python3 -m venv ~/ztl
+> source ~/ztl/bin/activate
+> pip install ztl
+```
+
+# Detailled Installation guide:
 
 You can easily install and use ZTL in a Python virtual environment in a two-step process. First, we need to setup the virtual environment and then install the library depending on your preferences. The process described covers various Ubuntu versions but the library can also be installed and used in Windows using  using slightly different commands.
 
