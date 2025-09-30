@@ -86,7 +86,7 @@ To test the correct installation of ZTL, you can use the following steps. Please
 First, spawn a server listening on port 12345 and the scope `/test`:
 
 ```bash
-> ztl_task_server 12345 /test
+> ztl_task_server -p 12345 -s /test
 INFO:remote-task:Task Server listening at 'tcp://*:12345'
 INFO:remote-task:Registering controller for scope '/test'.
 ```
@@ -94,7 +94,7 @@ The output confirms that the server component is listening at the specified port
 Then, call the server at the same port (on the local machine) under the same scope `/test` using a client (in a different terminal) to see how it replies:
 
 ```bash
-> ztl_task_client localhost 12345 /test some-handler:executing-component:goal-state
+> ztl_task_client -r localhost -p 12345 -s /test some-handler:executing-component:goal-state
 Connecting to host 'localhost:12345' at scope '/test'...
 INFO:remote-task:Remote task interface initialised at 'tcp://localhost:12345'.
 Triggering task with request 'c29tZS1oYW5kbGVywqxleGVjdXRpbmctY29tcG9uZW50wqxnb2FsLXN0YXRl'...
@@ -112,10 +112,10 @@ Initialising Task ID '1' (c29tZS1oYW5kbGVywqxleGVjdXRpbmctY29tcG9uZW50wqxnb2FsLX
 handler: some-handler
 component: executing-component
 goal: goal-state
-Status Task ID '1' (waiting poll)...
-Status Task ID '1' (waiting poll)...
-Status Task ID '1' (waiting poll)...
+Status Task ID '1' (waiting poll): ACCEPTED.
+Status Task ID '1' (waiting poll): ACCEPTED.
 ...
+Status Task ID '1' (waiting poll): COMPLETED.
 ```
 We find that the client first initialises a task (with the specification of handler, component, and goal) and then polls the server periodically about the status of the task it has provided.
 
