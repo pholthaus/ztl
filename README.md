@@ -13,14 +13,14 @@ This project contains the `ZTL` library enabling light-weight and widely compati
 
 # Installation guide:
 
-You can easily install and use ZTL in a Python virtual environment in a two-step process. First, we need to setup the virtual environment and then install the library depending on your preferences.
-
+You can easily install and use ZTL in a Python virtual environment in a two-step process. First, we need to setup the virtual environment and then install the library depending on your preferences. The process described covers various Ubuntu versions but the library can also be installed and used in Windows using  using slightly different commands.
 
 ## Preparing the virtual environment
 
 To create such an environment in your home directory, follow the below steps.
 You can install into any existing virtual environment or change the installation folder from ~/ztl to any other folder you prefer.
 Package installation on other operating systems might vary, but you should make sure to have `pip` and `venv` modules for python ready.
+
 For modern Ubuntu-based systems using Python 3, the first step is to create and activate a virtual environment:
 
 ```bash
@@ -35,14 +35,16 @@ For older Ubuntu systems using Python version 2, please use the following steps 
  virtualenv ~/ztl
 ```
 
-
-
 No matter which python version, next you need to load this environment.
 You have to repeat this step for every terminal you want to use the library in:
 
 ```bash
  source ~/ztl/bin/activate
 ```
+
+### Windows powershell
+
+.\Scripts\Activate.ps1
 
 ## Installing the library
 
@@ -136,7 +138,7 @@ class NoneController(TaskController):
         return State.FAILED, "Not implemented"
 
 
-    def abort(self, mid, request):    
+    def abort(self, mid, request):
         return State.REJECTED, "Not implemented"
 
 server = TaskServer(12345)
