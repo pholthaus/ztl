@@ -3,6 +3,8 @@
 import sys
 import time
 
+import argparse
+
 from ztl.core.server import TaskServer
 from ztl.core.protocol import State, Task
 from ztl.core.task import ExecutableTask, TaskExecutor, TaskController
@@ -40,8 +42,8 @@ class TaskTaskController(TaskController):
 
   def status(self, mid, request):
     if mid in self.running:
-      print("Status Task ID '%s' (%s)..." % (mid, request))
       state = self.running[mid].state()
+      print("Status Task ID '%s' (%s): %s." % (mid, request, State.name(state)))
       if state < State.COMPLETED:
         return state, State.name(state)
       else:
@@ -59,10 +61,17 @@ class TaskTaskController(TaskController):
       return State.REJECTED, "Invalid ID"
 
 def main_cli():
-  port = sys.argv[1]
-  scope = sys.argv[2]
-  server = TaskServer(port)
-  server.register(scope, TaskTaskController())
+
+  parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+  parser.add_argument("-p", "--port", type=int,
+                      help="The port on the local machine that the server should listen to.", required=True)
+  parser.add_argument("-s", "--scope", type=str,
+                      help="The scope that the server should respond to.", required=True)
+
+  args, unknown = parser.parse_known_args()
+
+  server = TaskServer(args.port)
+  server.register(args.scope, TaskTaskController())
   server.listen()
 
 
