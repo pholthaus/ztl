@@ -10,6 +10,9 @@ class ExecutableTask(object):
   def execute(self):
     pass
 
+  def status(self):
+    return None
+
   def abort(self):
     return False
 
@@ -80,14 +83,14 @@ class TaskExecutor(Thread):
         self.logger.debug("Task could not be aborted.")
       return success
 
-
   def abort(self):
     print("Aborting immediately as requested...")
     self._state = State.ABORTED
     super().abort()
 
-
   def state(self):
+    if self._state is State.ACCEPTED:
+      self._result = self.task.status()
     return self._state
 
   def result(self):
