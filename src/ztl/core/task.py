@@ -26,8 +26,8 @@ class TaskController(object):
   def init(self, request):
     self._current += 1
     request = Task.decode(request) # should be checked if appropriate here
-    cls, *parameters = self.assign(request["handler"], request["component"], request["goal"])
-    self._running[self._current] = TaskExecutor(cls, *parameters)
+    specs = self.assign(request["handler"], request["component"], request["goal"])
+    self._running[self._current] = TaskExecutor(specs[0], specs[1:])
     return self._current, "Initiated task '%s' with request: %s" % (self._current, request)
 
   def status(self, mid, request):
