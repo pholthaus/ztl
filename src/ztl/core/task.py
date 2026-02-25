@@ -19,7 +19,7 @@ class ExecutableTask(object):
 
 class TaskController(object):
 
-  def __init__(self, remote):
+  def __init__(self):
     self._current = 0
     self._running = {}
 
