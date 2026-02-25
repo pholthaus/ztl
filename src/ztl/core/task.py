@@ -27,13 +27,13 @@ class TaskController(object):
     self._current += 1
     request = Task.decode(request) # should be checked if appropriate here
     specs = self.assign(request["handler"], request["component"], request["goal"])
-    self._running[self._current] = TaskExecutor(specs[0], specs[1:])
+    self._running[self._current] = TaskExecutor(specs[0], *specs[1:])
     return self._current, "Initiated task '%s' with request: %s" % (self._current, request)
 
   def status(self, mid, request):
     if mid in self._running:
       state = self._running[mid].state()
-      result = self.executors[mid].result()
+      result = self._running[mid].result()
       return state, result
     else:
       return State.REJECTED, "Invalid ID '%s'" % mid
