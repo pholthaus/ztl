@@ -2,7 +2,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 from threading import Thread
-from ztl.core.protocol import State
+from ztl.core.protocol import State, Task
 
 
 class ExecutableTask(object):
@@ -19,16 +19,34 @@ class ExecutableTask(object):
 
 class TaskController(object):
 
-  def init(self, payload):
-    return -1, "Not implemented"
+  def __init__(self, remote):
+    self._current = 0
+    self._running = {}
 
+  def init(self, request):
+    self._current += 1
+    request = Task.decode(request)
+    cls, *parameters = self.assign(request["handler"], request["component"], request["goal"])
+    self._running[self._current] = TaskExecutor(cls, *parameters)
+    return self._current, "Initiated task '%s' with request: %s" % (self._current, request)
 
-  def status(self, mid, payload):
-      return State.REJECTED, "Not implemented"
+  def status(self, mid, request):
+    if mid in self._running:
+      state = self._running[mid].state()
+      return state, self._running[mid].result()
+    else:
+      return State.REJECTED, "Invalid ID '%s'" % mid
 
+  def abort(self, mid, request):
+    if mid in self._running:
+      success = self._running[mid].stop()
+      state = self._running[mid].state()
+      return state, success
+    else:
+      return State.REJECTED, "Invalid ID '%s'" % mid
 
-  def abort(self, mid, payload):
-    return State.REJECTED, "Not implemented"
+  def assign(self, handler, component, goal):
+    raise RuntimeError("Function 'assign' not implemented in controller.")
 
 
 class TaskExecutor(Thread):
