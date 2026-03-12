@@ -22,6 +22,7 @@ setup(name='ztl',
                   'ztl_simple_server=ztl.example.simple_server:main_cli',
                   'ztl_task_server=ztl.example.task_server:main_cli',
                   'ztl_task_client=ztl.example.task_client:main_cli',
+                  'ztl_remote_task=ztl.cmd.remote_client:main_cli',
                   'ztl_run_script=ztl.script.run_script:main_cli'
             ]
       },
