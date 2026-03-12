@@ -1,0 +1,16 @@
+sequential:
+  first step:
+    test:
+      sleep: 2
+  second step:
+    test:
+      print: "this should be printed"
+  third step:
+    test:
+      echo: "this should be echoed"
+parallel:
+  single step:
+    test:
+      sleep: 2
+      print: "this should be printed"
+      echo: "this should be echoed"
