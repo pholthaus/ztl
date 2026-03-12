@@ -12,16 +12,24 @@ class Remotes():
 
     self.logger = logging.getLogger('remote-config')
     self.remotes = {}
+    self.config = {}
 
     with open(configfile) as f:
-      config = yaml.safe_load(f)
-      rs = config["remotes"]
-      for name in rs.keys():
-        self.add(name, rs[name]["host"], rs[name]["port"], rs[name]["scope"])
+      self.config = yaml.safe_load(f)
 
 
   def get(self, name):
-    return self.remotes[name]
+
+    if name in self.remotes:
+      return self.remotes[name]
+
+    else:
+      rs = self.config["remotes"]
+      if name in rs.keys():
+        self.add(name, rs[name]["host"], rs[name]["port"], rs[name]["scope"])
+        return self.remotes[name]
+
+      return None
 
 
   def has(self, name):
