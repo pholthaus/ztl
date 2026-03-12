@@ -11,10 +11,12 @@ logging.basicConfig(level=logging.INFO)
 from sys import stdin, exit
 from ztl.core.protocol import State, Task
 from ztl.core.client import RemoteTask
+from ztl.core.config import Remotes
 
 class _Getch:
-    """Gets a single character from standard input.  Does not echo to the
-screen."""
+    """
+    Gets a single character from standard input. Does not echo to the screen.
+    """
     def __init__(self):
         try:
             self.impl = _GetchWindows()
@@ -52,18 +54,9 @@ class ScriptExecutor(object):
 
   def __init__(self, configfile, scriptfile):
     self.logger = logging.getLogger('script-exec')
-
     self.getch = _Getch()
-
     self.lastScene = None
-
-    with open(configfile) as f:
-      self.config = yaml.safe_load(f)
-
-      rs = self.config["remotes"]
-      for r in rs.keys():
-        self.logger.info("Initialising remote task interface '%s'..." % r)
-        self.tasks[r] = RemoteTask(rs[r]["host"], rs[r]["port"], rs[r]["scope"])
+    self.remotes = Remotes(configfile)
 
     with open(scriptfile) as f:
       self.script = yaml.safe_load(f)
@@ -80,7 +73,7 @@ class ScriptExecutor(object):
       name = name[0:o]
       for param in params.split(","):
         pp = param.split("=")
-        if len(pp) is 2:
+        if len(pp) == 2:
           key = pp[0].strip()
           value = pp[1].strip()
           if key == "delay":
@@ -109,7 +102,8 @@ class ScriptExecutor(object):
       task_ids = []
       handlers = self.script[scene][step].keys()
       for handler in handlers:
-        if handler in self.tasks:
+        remote = self.remotes.get(handler)
+        if not remote is None:
           components = self.script[scene][step][handler].keys()
           for component in components:
             component_name, component_delay, component_wait = self.parse_stage(component)
@@ -118,7 +112,7 @@ class ScriptExecutor(object):
             if component_delay > 0:
               time.sleep(component_delay)
 
-            remote_id, reply = self.tasks[handler].trigger(Task.encode(handler, component_name, goal))
+            remote_id, reply = remote.trigger(Task.encode(handler, component_name, goal))
             if remote_id > 0:
               if step_wait and component_wait:
                 task_ids.append(str(remote_id) + ":" + str(handler) + ":" + str(component_name) + ":" + str(goal))
@@ -136,8 +130,8 @@ class ScriptExecutor(object):
         for task_id in task_ids:
           components = task_id.split(":")
           remote_id = int(components[0])
-          rid = components[1]
-          status, reply = self.tasks[rid].wait(remote_id, task_id, timeout=100)
+          handler = components[1]
+          status, reply = self.remotes.get(handler).wait(remote_id, task_id, timeout=100)
           running = running or status <= State.ACCEPTED
         time.sleep(.1)
 
@@ -163,7 +157,7 @@ class ScriptExecutor(object):
     else:
       print("PRESS <ENTER> TO CONFIRM, PRESS <R> TO REPLAY LAST SCENE OR ANY OTHER KEY TO SKIP")
       return self.get_key()
-  
+
   def get_key(self):
     first_char = self.getch()
     if first_char == '\x03':
