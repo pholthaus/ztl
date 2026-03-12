@@ -40,8 +40,8 @@ class RemoteTask(object):
       reply = Message.decode(self.socket.recv())
       return int(reply["id"]), reply["payload"]
     except Exception as e:
-      self.logger.error(e)
-      return -1, str(e)
+      self.logger.error(repr(e))
+      return -1, repr(e)
 
   def abort(self, mid, payload="abort command"):
     """
@@ -63,8 +63,8 @@ class RemoteTask(object):
       reply = Message.decode(self.socket.recv())
       return int(reply["state"]), reply["payload"]
     except Exception as e:
-      self.logger.error(e)
-      return -1, str(e)
+      self.logger.error(repr(e))
+      return -1, repr(e)
 
   def status(self, mid, payload="status update"):
     """
@@ -77,7 +77,7 @@ class RemoteTask(object):
 
     Returns
     -------
-    id: The current status of the task at the server. -1 if server not reachable or communication error.
+    status: The current status of the task at the server. State.FAILED if server not reachable or communication error.
     reply: The remote reply containing an updated task description or the error message if server not reachable or communication error.
     """
     try:
@@ -86,8 +86,8 @@ class RemoteTask(object):
       reply = Message.decode(self.socket.recv())
       return int(reply["state"]), reply["payload"]
     except Exception as e:
-      self.logger.error(e)
-      return -1, str(e)
+      self.logger.error(repr(e))
+      return State.FAILED, repr(e)
 
   def wait(self, mid, payload = "waiting poll", timeout = 5.0):
     """
@@ -101,7 +101,7 @@ class RemoteTask(object):
 
     Returns
     -------
-    state: The last task status after waiting complete. -1 if server not reachable or communication error.
+    state: The last task status after waiting complete. State.FAILED if server not reachable or communication error.
     reply: The remote reply containing an updated task description or the error message if server not reachable or communication error.
     """
     start = time.time()
