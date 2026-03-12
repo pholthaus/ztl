@@ -10,55 +10,37 @@ from ztl.core.protocol import State, Task
 from ztl.core.task import ExecutableTask, TaskExecutor, TaskController
 
 
-class PrintTask(ExecutableTask):
+class TestTask(ExecutableTask):
 
-  def __init__(self, request):
+  def __init__(self, component, goal):
     self.active = True
-    self.request = request
-    self.description = Task.decode(self.request)
+    self.component = component
+    self.goal = goal
 
   def execute(self):
-    print("handler: " + self.description["handler"])
-    print("component: " + self.description["component"])
-    print("goal: " + self.description["goal"])
-    time.sleep(3)
-    return "finished"
+    if self.component == "echo":
+      return self.goal
+    if self.component == "print":
+      print("component: " + self.component)
+      print("goal: " + self.goal)
+      return True
+    if self.component == "sleep":
+      time.sleep(int(self.goal))
+      return True
+    else:
+      raise RuntimeError("No such component '%s', try 'echo/print/sleep'." % self.component)
 
   def abort(self):
     return False
 
 
-class TaskTaskController(TaskController):
+class TestController(TaskController):
 
-  def __init__(self):
-    self.current_id = 0
-    self.running = {}
+  def assign(self, handler, component, goal):
+    if handler == "test":
+      return TestTask, component, goal
+    raise RuntimeError("No such handler '%s', try 'test'." % handler)
 
-  def init(self, request):
-    self.current_id += 1
-    print("Initialising Task ID '%s' (%s)..." % (self.current_id, request))
-    self.running[self.current_id] = TaskExecutor(PrintTask, request)
-    return self.current_id, "Initiated task '%s' with request: %s" % (self.current_id, request)
-
-  def status(self, mid, request):
-    if mid in self.running:
-      state = self.running[mid].state()
-      print("Status Task ID '%s' (%s): %s." % (mid, request, State.name(state)))
-      if state < State.COMPLETED:
-        return state, State.name(state)
-      else:
-        return state, self.running[mid].result()
-    else:
-      return State.REJECTED, "Invalid ID"
-
-  def abort(self, mid, request):
-    if mid in self.running:
-      print("Aborting Task ID '%s' (%s)..." % (mid, request))
-      success = self.running[mid].stop()
-      state = self.running[mid].state()
-      return state, success
-    else:
-      return State.REJECTED, "Invalid ID"
 
 def main_cli():
 
@@ -71,7 +53,7 @@ def main_cli():
   args, unknown = parser.parse_known_args()
 
   server = TaskServer(args.port)
-  server.register(args.scope, TaskTaskController())
+  server.register(args.scope, TestController())
   server.listen()
 
 
