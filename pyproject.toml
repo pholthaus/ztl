@@ -1,6 +1,6 @@
 [project]
 name = "ztl"
-version = "0.1.4"
+version = "0.1.5"
 authors = [
   { name="Patrick Holthaus", email="patrick.holthaus@googlemail.com" },
 ]
