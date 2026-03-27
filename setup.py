@@ -9,12 +9,12 @@ setup(name='ztl',
       author_email='patrick.holthaus@googlemail.com',
       url='https://gitlab.com/robothouse/rh-user/ztl/',
       package_dir={'':'src'},
-      packages=['ztl', 'ztl.core', 'ztl.example', 'ztl.script'],
       scripts=['src/ztl/example/simple_client.py',
             'src/ztl/example/simple_server.py',
             'src/ztl/example/task_client.py',
             'src/ztl/example/task_server.py',
-            'src/ztl/script/run_script.py'
+            'src/ztl/cmd/run_script.py',
+            'src/ztl/cmd/remote_task.py'
       ],
       entry_points={
             'console_scripts': [
@@ -22,8 +22,8 @@ setup(name='ztl',
                   'ztl_simple_server=ztl.example.simple_server:main_cli',
                   'ztl_task_server=ztl.example.task_server:main_cli',
                   'ztl_task_client=ztl.example.task_client:main_cli',
-                  'ztl_remote_task=ztl.cmd.remote_client:main_cli',
-                  'ztl_run_script=ztl.script.run_script:main_cli'
+                  'ztl_remote_task=ztl.cmd.remote_task:main_cli',
+                  'ztl_run_script=ztl.cmd.run_script:main_cli'
             ]
       },
       install_requires=[
