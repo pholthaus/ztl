@@ -1,8 +1,8 @@
 import zmq
 import logging
 
-from server import TaskServer
-from task import ExecutableTask, TaskController
+from ztl.core.server import TaskServer
+from ztl.core.task import ExecutableTask, TaskController
 
 logging.basicConfig(level=logging.INFO)
 
