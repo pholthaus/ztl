@@ -1,11 +1,7 @@
 import zmq
 import logging
 
-from ztl.core.server import TaskServer
-from ztl.core.task import ExecutableTask, TaskController
-
 logging.basicConfig(level=logging.INFO)
-
 
 class ObjectPublisher(object):
 
@@ -19,10 +15,6 @@ class ObjectPublisher(object):
     self.logger.info("Publisher '%s' created at '%s'" % (scope, address))
     
   def publish(self, obj):
-    self.logger.info("Publishing %s...", repr(obj))
+    self.logger.debug("Publishing %s...", repr(obj))
     self.socket.send_string(self.scope, zmq.SNDMORE)
-    self.socket.send_pyobj(obj)
-
-if __name__ == "__main__":
-  
-  o = ObjectPublisher(5551, "testy")
+    self.socket.send_pyobj(obj)  

@@ -25,6 +25,7 @@ class ObjectSubscriber(Thread):
       while self.active:
         topic = self.socket.recv_string()
         obj = self.socket.recv_pyobj()
+        self.logger.debug("Received object %s, executing callback...", repr(obj))
         self.callback(obj)
     except Exception as e:
       self.logger.error("Listening failed: '%s'", e)
