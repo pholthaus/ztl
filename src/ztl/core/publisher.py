@@ -1,6 +1,5 @@
 import zmq
 import logging
-import cv2
 
 
 logging.basicConfig(level=logging.INFO)
@@ -21,15 +20,3 @@ class ObjectPublisher(object):
     # self.logger.info("Publishing %s...", repr(obj))
     self.socket.send_string(self.scope, zmq.SNDMORE)
     self.socket.send_pyobj(obj)
-
-
-def main_cli():
-  p = ObjectPublisher(5555, "camera_frame")
-  cap = cv2.VideoCapture(0)
-  while True:
-    p.publish(cap.read())
-  
-
-if __name__ == "__main__":
-
-  main_cli()
