@@ -19,6 +19,7 @@ class PublisherService(ExecutableTask):
     def execute(self):
       goal = str(self.goal).lower() in ['true', '1', 't', 'y', 'yes']
       self.publisher.setEnabled(goal)
+      return goal
 
 class PublisherController(TaskController):
   
@@ -48,7 +49,6 @@ class ObjectPublisher(object):
     self.socket.bind(address)
     self.scope = scope
     self.logger.info("Publisher '%s' created at '%s'" % (scope, address))
-    self.setEnabled(True)
     
     server = TaskServer(port * 2)
     server.register(scope + ":service", PublisherController(self))
