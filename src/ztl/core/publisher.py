@@ -1,6 +1,8 @@
 import zmq
 import logging
 
+import threading
+
 from ztl.core.server import TaskServer
 from ztl.core.task import ExecutableTask, TaskController
 
@@ -47,9 +49,11 @@ class ObjectPublisher(object):
     self.scope = scope
     self.logger.info("Publisher '%s' created at '%s'" % (scope, address))
     self.setEnabled(True)
-    self.server = TaskServer(port * 2)
-    self.server.register(scope + ":service", PublisherController(self))
-    self.server.listen()
+    
+    server = TaskServer(port * 2)
+    server.register(scope + ":service", PublisherController(self))
+    service = threading.Thread(target=server.listen)
+    service.start()
     
     
   def publish(self, obj):
