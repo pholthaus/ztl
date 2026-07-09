@@ -1,6 +1,6 @@
 [project]
 name = "ztl"
-version = "0.2.0"
+version = "0.2.1"
 authors = [
   { name="Patrick Holthaus", email="patrick.holthaus@googlemail.com" },
 ]
@@ -22,6 +22,8 @@ dependencies = [
 [project.scripts]
 ztl_simple_server = "ztl.example.simple_server:main_cli"
 ztl_simple_client = "ztl.example.simple_client:main_cli"
+ztl_simple_publisher = "ztl.example.simple_publisher:main_cli"
+ztl_simple_subscriber = "ztl.example.simple_subscriber:main_cli"
 ztl_task_server = "ztl.example.task_server:main_cli"
 ztl_task_client = "ztl.example.task_client:main_cli"
 ztl_remote_task = "ztl.cmd.remote_task:main_cli"
