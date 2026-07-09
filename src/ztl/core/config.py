@@ -38,4 +38,6 @@ class Remotes():
 
   def add(self, name, host, port, scope):
     self.logger.info("Initialising remote task interface '%s'..." % name)
+    if name in self.remotes:
+      self.logger.warning("Overriding existing remote task interface '%s'." % name)
     self.remotes[name] = RemoteTask(host, port, scope)
