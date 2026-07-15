@@ -81,9 +81,25 @@ class ScriptExecutor(object):
           if key == "wait":
             wait = value.lower() in ['true', '1', 't', 'y', 'yes', 'on']
     return name, delay, wait
+  
+  def parse_remote(self, remote):
+    name = str(remote)
+
+    o = name.find("(")
+    c = name.find(")")
+    if o > 0 and c > 0:
+      params = name[o+1:c]
+      name = name[0:o]
+      for param in params.split(","):
+        pp = param.split("=")
+        if len(pp) == 2:
+          key = pp[0].strip()
+          value = pp[1].strip()
+          if key == "remote":
+            remote = value
+    return name, remote
 
   def execute_scene(self, scene):
-
     scene_name, scene_delay, scene_wait = self.parse_stage(scene)
     steps = list(self.script[scene].keys())
 
@@ -102,8 +118,10 @@ class ScriptExecutor(object):
       task_ids = []
       handlers = self.script[scene][step].keys()
       for handler in handlers:
-        remote = self.remotes.get(handler)
-        if not remote is None:
+        handler_name, remote = self.parse_remote(handler)
+        
+        task = self.remotes.get(remote)
+        if not task is None:
           components = self.script[scene][step][handler].keys()
           for component in components:
             component_name, component_delay, component_wait = self.parse_stage(component)
@@ -112,7 +130,7 @@ class ScriptExecutor(object):
             if component_delay > 0:
               time.sleep(component_delay)
 
-            remote_id, reply = remote.trigger(Task.encode(handler, component_name, goal))
+            remote_id, reply = task.trigger(Task.encode(handler_name, component_name, goal))
             if remote_id > 0:
               if step_wait and component_wait:
                 task_ids.append(str(remote_id) + ":" + str(handler) + ":" + str(component_name) + ":" + str(goal))
@@ -130,8 +148,8 @@ class ScriptExecutor(object):
         for task_id in task_ids:
           components = task_id.split(":")
           remote_id = int(components[0])
-          handler = components[1]
-          status, reply = self.remotes.get(handler).wait(remote_id, task_id, timeout=100)
+          handler_name, remote = self.parse_remote(components[1])
+          status, reply = self.remotes.get(remote).wait(remote_id, task_id, timeout=100)
           running = running or status <= State.ACCEPTED
         time.sleep(.1)
 
