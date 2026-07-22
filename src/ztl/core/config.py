@@ -1,5 +1,5 @@
 
-import yaml
+import oyaml as yaml
 
 import logging
 logging.basicConfig(level=logging.INFO)
