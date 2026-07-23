@@ -4,13 +4,12 @@ import time
 import oyaml as yaml
 import argparse
 import os
+import sys
 import logging
 
 logging.basicConfig(level=logging.INFO)
 
-from sys import stdin, exit
 from ztl.core.protocol import State, Task
-from ztl.core.client import RemoteTask
 from ztl.core.config import Remotes
 
 class _Getch:
@@ -27,10 +26,10 @@ class _Getch:
 
 class _GetchUnix:
     def __init__(self):
-        import tty, sys
+        import tty, termios
 
     def __call__(self):
-        import sys, tty, termios
+        import tty, termios
         fd = sys.stdin.fileno()
         old_settings = termios.tcgetattr(fd)
         try:
@@ -169,7 +168,7 @@ class ScriptExecutor(object):
           goal = self.script[scene][step][handler][component]
           print("\t%s [%s]: -> %s" % (handler, component, goal))
 
-    if self.lastScene == None:
+    if self.lastScene is None:
       print("PRESS <ENTER> TO CONFIRM or ANY OTHER KEY TO SKIP")
       return self.get_key()
     else:
@@ -179,7 +178,7 @@ class ScriptExecutor(object):
   def get_key(self):
     first_char = self.getch()
     if first_char == '\x03':
-      exit(1)
+      sys.exit(1)
     # The idea would be to allow further decomposition of the getch e.g. if arrows keys are pressed
     return first_char
 
@@ -227,10 +226,10 @@ class ScriptExecutor(object):
           self.lastScene = None
     except Exception as e:
       self.logger.error(e)
-      exit(1)
+      sys.exit(1)
     except KeyboardInterrupt:
       self.logger.error("Interrupted, exiting.")
-      exit(1)
+      sys.exit(1)
 
 def main_cli():
 
