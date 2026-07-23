@@ -4,7 +4,7 @@ This project contains the `ZTL` library enabling light-weight and widely compati
 # System requirements:
 
  * ZTL is compatible with all major operating systems running Python and is independent of any specific hardware.
- * ZTL has been tested on Ubuntu versions 16.04, 18.04, 20.04, 22.04, 24.04.
+ * ZTL has been tested on Ubuntu versions 16.04, 18.04, 20.04, 22.04, 24.04, 26.04.
  * ZTL has the following dependencies:
    * [pyzmq](https://pypi.org/project/pyzmq/)
    * [oyaml](https://pypi.org/project/oyaml/)
