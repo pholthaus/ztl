@@ -14,5 +14,5 @@ provide food (delay = 2):
     cob:
       tts: cob_recognise
   tts list:
-    cob:
-      tts: cob_list_items
+    navel(remote=nv2):
+      tts: "hello from navel"
