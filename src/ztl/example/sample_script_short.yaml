@@ -1,7 +1,0 @@
-scene:
-  first step:
-    testhandler:
-      print: "test me"
-  second step:
-    testhandler:
-      print: "another test"

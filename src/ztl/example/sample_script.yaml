@@ -1,18 +1,9 @@
-provide food (delay = 2):
-  cob position(delay = 1, wait = False):
-    cob:
-      base: cob_present
-    fetch:
-      base: fetch_server
-  address audience(wait=False):
-    cob:
-      tts: cob_drink_prompt
-  move robots(delay  = 2):
-    cob:
-      base: fetch_sofa
-  tts recognise:
-    cob:
-      tts: cob_recognise
-  tts list:
-    cob:
-      tts: cob_list_items
+scene:
+  first step:
+    test:
+      print: "test me"
+      sleep: 5
+  second step:
+    test:
+      echo: "another test"
+
