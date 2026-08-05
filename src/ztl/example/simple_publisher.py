@@ -13,12 +13,21 @@ class SimplePublisher(ObjectPublisher):
       count = 0
       while True:
         data = {'one': 1, 'more': 2, 'count': count}
-        self.logger.info("Publishing data: %s..." % data)
-        self.publish(data)
-        count = count + 1
+        subscribers = self.get_subscriber_count()
+        if subscribers > 0:
+          self.logger.info("Publishing data to %s subscribers: %s..." % (subscribers, data))
+          self.publish(data)
+          count = count + 1
+        else:
+          self.logger.info("Skip publishing (no subscribers)..." % data)
         time.sleep(1)
     except Exception as e:
-      self.logger.error("Exception while publishing: %s" % repr(e))
+      self.logger.error("Exception while publishing: %s, exiting." % repr(e))
+      self.set_active(False)
+      
+    except KeyboardInterrupt:
+      self.logger.error("Exit signal received, exiting.")
+      self.set_active(False)
 
 
 def main_cli():
