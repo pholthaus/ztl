@@ -16,7 +16,10 @@ class ZMQEndpoints():
     self.logger = logging.getLogger('remote-config')
     self.remotes = {}
     self.publishers = {}
-    self.config = {}
+    self.config = {
+      "remotes": {},
+      "publishers": {}
+    }
 
     if parser is None:
       parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -40,8 +43,11 @@ class ZMQEndpoints():
 
     args, unknown = parser.parse_known_args()
 
-    with open(args.config) as f:
-      self.config = yaml.safe_load(f)
+    try:
+      f = open(args.config)
+      self.config.update(yaml.safe_load(f))
+    except Exception as e:
+      self.logger.warning("WARNING: Configuration file '%s' not found/accessible, remote services will not be accessible." % args.config)
 
     if args.task:
       for remote in args.task:
@@ -81,8 +87,8 @@ class ZMQEndpoints():
 
 
   def get_remote_config(self, name):
-    return self.config["remotes"][name]
-
+    if name in self.config["remotes"]:
+      return self.config["remotes"][name]
 
   def get_subscriber(self, name):
     if name in self.publishers:
@@ -109,4 +115,5 @@ class ZMQEndpoints():
 
 
   def get_publisher_config(self, name):
-    return self.config["publishers"][name]
+    if name in self.config["publishers"]:
+      return self.config["publishers"][name]
