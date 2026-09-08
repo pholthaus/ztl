@@ -23,4 +23,4 @@ class TestImports(TestCase):
         from ztl.core.task import ExecutableTask, TaskController, TaskExecutor
 
     def test_ztl_config_imports(self):
-        from ztl.core.config import Remotes
+        from ztl.core.config import ZMQEndpoints
