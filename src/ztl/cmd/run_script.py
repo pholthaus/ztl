@@ -10,7 +10,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 from ztl.core.protocol import State, Task
-from ztl.core.config import Remotes
+from ztl.core.config import ZMQEndpoints
 
 class _Getch:
     """
@@ -51,11 +51,11 @@ class ScriptExecutor(object):
 
   tasks = {}
 
-  def __init__(self, configfile, scriptfile):
+  def __init__(self, endpoints, scriptfile):
     self.logger = logging.getLogger('script-exec')
     self.getch = _Getch()
     self.lastScene = None
-    self.remotes = Remotes(configfile)
+    self.endpoints = endpoints
 
     with open(scriptfile) as f:
       self.script = yaml.safe_load(f)
@@ -119,7 +119,7 @@ class ScriptExecutor(object):
       for handler in handlers:
         handler_name, remote = self.parse_remote(handler)
         
-        task = self.remotes.get(remote)
+        task = self.endpoints.get_remote(remote)
         if not task is None:
           components = self.script[scene][step][handler].keys()
           for component in components:
@@ -148,7 +148,7 @@ class ScriptExecutor(object):
           components = task_id.split(":")
           remote_id = int(components[0])
           handler_name, remote = self.parse_remote(components[1])
-          status, reply = self.remotes.get(remote).wait(remote_id, task_id, timeout=100)
+          status, reply = self.endpoints.get_remote(remote).wait(remote_id, task_id, timeout=100)
           running = running or status <= State.ACCEPTED
         time.sleep(.1)
 
@@ -233,16 +233,14 @@ class ScriptExecutor(object):
 
 def main_cli():
 
-  cfg_file = os.environ.get('XDG_CONFIG_HOME', os.environ.get('HOME', '/home/demo') + '/.config') + '/zmq-remotes.yaml'
-
   parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-  parser.add_argument("-c", "--config", type=str,
-                      help="Configuration file location.", default=cfg_file)
   parser.add_argument("-s", "--script", type=str,
                       help="Script file to execute.", required=True)
 
+  endpoints = ZMQEndpoints(parser = parser)
   args, unknown = parser.parse_known_args()
-  run = ScriptExecutor(args.config, args.script)
+
+  run = ScriptExecutor(endpoints, args.script)
   run.execute()
 
 

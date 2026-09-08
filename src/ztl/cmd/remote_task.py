@@ -7,16 +7,14 @@ import argparse
 
 from ztl.core.client import RemoteTask
 from ztl.core.protocol import State, Task
-from ztl.core.config import Remotes
+from ztl.core.config import ZMQEndpoints
 
 def main_cli():
 
   cfg_file = os.environ.get('XDG_CONFIG_HOME', os.environ.get('HOME', '/home/demo') + '/.config') + '/zmq-remotes.yaml'
 
   parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-  parser.add_argument("-c", "--config", type=str,
-                      help="Configuration file location.", default=cfg_file)
-  parser.add_argument("-t", "--timeout", type=int,
+  parser.add_argument("--timeout", type=int,
                       help="An optional timeout to wait for task completion, continues waiting if 0 or less", required=False, default=-1)
   parser.add_argument("remote", type=str,
                       help="The task remote as specified in the configuration file.")
@@ -24,16 +22,16 @@ def main_cli():
                       help="The task specification payload, with handler, component and goal separated by ':', e.g. 'handler:component:goal'.")
 
 
+  endpoints = ZMQEndpoints(parser = parser)
   args, unknown = parser.parse_known_args()
+
   cmd = args.payload.split(":", 2)
   if len(cmd) < 3:
     print("Error: Invalid task specification. Payload needs to specify handler, component and goal separated by ':', e.g. 'handler:component:goal'")
     parser.print_help(sys.stderr)
     return -1
 
-  remotes = Remotes(args.config)
-  task = remotes.get(args.remote)
-
+  task = endpoints.get_remote(args.remote)
   request = Task.encode(cmd[0], cmd[1], cmd[2])
 
   print("Triggering task with request '%s'..." % request)
