@@ -51,7 +51,6 @@ class ObjectPublisher(object):
     self.tracker = ConnectionTracker(monitor)
     self.tracker.start()
 
-    
     self.logger.info("Publisher '%s' created at '%s'" % (scope, address))
     
   def publish(self, obj):
