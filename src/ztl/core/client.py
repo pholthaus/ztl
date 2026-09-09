@@ -12,14 +12,33 @@ class RemoteTask(object):
 
     self.logger = logging.getLogger('remote-task')
     self.context = zmq.Context()
-    self.socket = self.context.socket(zmq.REQ)
-    self.socket.setsockopt(zmq.RCVTIMEO, timeout)
-    self.socket.setsockopt(zmq.LINGER, 1)
     self.address = "tcp://" + str(host) + ":" + str(port)
-    self.socket.connect(self.address)
+    self.timeout = timeout
     self.scope = scope
+    self.socket = None
+    self._connect()
 
     self.logger.info("Remote task interface initialised at '%s'.", self.address)
+
+  def _connect(self):
+    if self.socket is not None:
+      self.logger.warning("Reconnecting remote task interface at '%s'.", self.address)
+      self.socket.setsockopt(zmq.LINGER, 0)
+      self.socket.close()
+
+    self.socket = self.context.socket(zmq.REQ)
+    self.socket.setsockopt(zmq.RCVTIMEO, self.timeout)
+    self.socket.setsockopt(zmq.SNDTIMEO, self.timeout)
+    self.socket.setsockopt(zmq.LINGER, 1)
+
+    self.socket.connect(self.address)
+
+  def _disconnect(self):
+    if not self.socket is None:
+      self.socket.setsockopt(zmq.LINGER, 0)
+      self.socket.close()
+      self.socket = None
+
 
   def trigger(self, payload):
     """
@@ -34,13 +53,19 @@ class RemoteTask(object):
     id: An ID for the task assigned by the server if accepted, -1 if rejected or server not reachable or communication error.
     reply: The remote reply containing an updated task description or the error message if rejected or server not reachable or communication error.
     """
-    msg = Message.encode(self.scope, Request.INIT, -1, payload)
     try:
+      if self.socket is None:
+        self._connect()
+      msg = Message.encode(self.scope, Request.INIT, -1, payload)
       self.socket.send(msg)
       reply = Message.decode(self.socket.recv())
       return int(reply["id"]), reply["payload"]
+    except zmq.error.ZMQError as e:
+      self._disconnect()
+      self.logger.error("Networking error, disconnecting: %s", repr(e))
+      return -1, repr(e)
     except Exception as e:
-      self.logger.error(repr(e))
+      self.logger.error("Exception occurred: %s", repr(e))
       return -1, repr(e)
 
   def abort(self, mid, payload="abort command"):
@@ -58,12 +83,18 @@ class RemoteTask(object):
     reply: The remote reply containing an updated task description. May contain error message if task not aborted or server not reachable or communication error.
     """
     try:
+      if self.socket is None:
+        self._connect()
       msg = Message.encode(self.scope, Request.ABORT, mid, payload)
       self.socket.send(msg)
       reply = Message.decode(self.socket.recv())
       return int(reply["state"]), reply["payload"]
+    except zmq.error.ZMQError as e:
+      self._disconnect()
+      self.logger.error("Networking error, disconnecting: %s", repr(e))
+      return -1, repr(e)
     except Exception as e:
-      self.logger.error(repr(e))
+      self.logger.error("Exception occurred: %s", repr(e))
       return -1, repr(e)
 
   def status(self, mid, payload="status update"):
@@ -81,12 +112,18 @@ class RemoteTask(object):
     reply: The remote reply containing an updated task description or the error message if server not reachable or communication error.
     """
     try:
+      if self.socket is None:
+        self._connect()
       msg = Message.encode(self.scope, Request.STATUS, mid, payload)
       self.socket.send(msg)
       reply = Message.decode(self.socket.recv())
       return int(reply["state"]), reply["payload"]
+    except zmq.error.ZMQError as e:
+      self._disconnect()
+      self.logger.error("Networking error, disconnecting: %s", repr(e))
+      return State.FAILED, repr(e)
     except Exception as e:
-      self.logger.error(repr(e))
+      self.logger.error("Exception occurred: %s", repr(e))
       return State.FAILED, repr(e)
 
   def wait(self, mid, payload = "waiting poll", timeout = 5.0):
