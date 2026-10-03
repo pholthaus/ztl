@@ -33,7 +33,7 @@ class ConnectionTracker(Thread):
               
           elif event['event'] == zmq.EVENT_DISCONNECTED:
               self.subscribers = max(0, self.subscribers - 1)
-              self.logger.debug("Subscriber left! Total connected: %s", self.subscribers)
+              self.logger.info("Subscriber left! Total connected: %s", self.subscribers)
               
 
 class ObjectPublisher(object):
