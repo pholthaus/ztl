@@ -104,10 +104,11 @@ class ZMQEndpoints():
 
 
   def add_subscriber(self, name, host, port, scope):
-    self.logger.info("Initialising subscriber for publisher '%s'..." % name)
+    self.logger.info("Initialising subscriber for publisher '%s' at '%s'..." % (name, scope))
     if name in self.publishers:
       self.logger.warning("Overriding existing subscriber for publisher '%s'." % name)
     self.publishers[name] = ObjectSubscriber(host, port, scope)
+    return self.publishers[name]
 
 
   def has_publisher(self, name):
