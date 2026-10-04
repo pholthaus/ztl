@@ -53,9 +53,9 @@ class ObjectPublisher(object):
 
     self.logger.info("Publisher '%s' created at '%s'" % (scope, address))
     
-  def publish(self, obj):
-    self.logger.debug("Publishing %s...", repr(obj))
-    self.socket.send_string(self.scope, zmq.SNDMORE)
+  def publish(self, obj, path="/"):
+    self.logger.debug("Publishing '%s' via '%s'..." % (repr(obj), (self.scope + path)))
+    self.socket.send_string(self.scope + path, zmq.SNDMORE)
     self.socket.send_pyobj(obj)
     
   def get_subscriber_count(self):
